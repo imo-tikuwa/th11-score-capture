@@ -18,6 +18,8 @@ import colorama
 colorama.init()
 # 設定ファイルを利用する
 import configparser
+# 関数をインポート
+from functions import *
 
 
 # 変数(定数扱いする変数)
@@ -25,6 +27,9 @@ import configparser
 TH11_WINDOW_NAME = '東方地霊殿　～ Subterranean Animism. ver 1.00a'
 CONFIG_FILE_NAME = 'settings.ini'
 OUTPUT_DIR = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'output' + os.sep
+SAMPLE_DIR = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'sample_data' + os.sep
+SAMPLE_NUMBERS_DIR = SAMPLE_DIR + 'number' + os.sep
+SAMPLE_REMAINS_DIR = SAMPLE_DIR + 'remain' + os.sep
 
 # スコアのROI配列(10億、1億、1000万...の順)
 SCORE_ROIS = []
@@ -50,8 +55,19 @@ for index in range(9):
     bottom = top + height
     REMAIN_ROIS.append((left, top, right, bottom))
 
-# --------------------------------------------------
+# スコアのサンプルデータ(0～9)
+BINARY_NUMBERS = []
+for index in range(10):
+    img = cv2.imread(SAMPLE_NUMBERS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
+    BINARY_NUMBERS.append(img)
 
+# 残機のサンプルデータ(1、1/5、2/5、3/5、4/5)
+BINARY_REMAINS = []
+for index in range(5):
+    img = cv2.imread(SAMPLE_REMAINS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
+    BINARY_REMAINS.append(img)
+
+# --------------------------------------------------
 
 @click.command()
 def main():
@@ -135,18 +151,17 @@ def main():
             img.save(OUTPUT_DIR + current_time + '.png')
             original_frame = np.array(img)
 
-            # スコアの数字を1つずつクリッピングして保存
-            for index, roi in enumerate(SCORE_ROIS):
-                clopped_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
-                file_name = OUTPUT_DIR + current_time + '_score_' + str(index) + '.png'
-                cv2.imwrite(file_name, clopped_frame)
+            # 二値化
+            work_frame = edit_frame(original_frame)
 
-            # 残機の数字を1つずつクリッピングして保存
-            for index, roi in enumerate(REMAIN_ROIS):
-                clopped_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
-                file_name = OUTPUT_DIR + current_time + '_remain_' + str(index) + '.png'
-                cv2.imwrite(file_name, clopped_frame)
+            # スコアの数字についてテンプレートマッチング
+            score = analyze_score(SCORE_ROIS, BINARY_NUMBERS, work_frame)
 
+            # 残機についてテンプレートマッチング
+            remain = analyze_remain(REMAIN_ROIS, BINARY_REMAINS, work_frame)
+
+            print("スコア ： " + score)
+            print("残機　 ： " + str(remain))
 
     except KeyboardInterrupt:
         print(colored("プログラムを終了します", "green"))
