@@ -11,20 +11,50 @@ import ctypes
 from PIL import ImageGrab
 import sys
 import tkinter, tkinter.filedialog, tkinter.messagebox
+from datetime import datetime
 # print出力に色付ける
 from termcolor import colored
 import colorama
 colorama.init()
-
 # 設定ファイルを利用する
 import configparser
 
-# 変数
+
+# 変数(定数扱いする変数)
+# --------------------------------------------------
 TH11_WINDOW_NAME = '東方地霊殿　～ Subterranean Animism. ver 1.00a'
 CONFIG_FILE_NAME = 'settings.ini'
+OUTPUT_DIR = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'output' + os.sep
+
+# スコアのROI配列(10億、1億、1000万...の順)
+SCORE_ROIS = []
+width = 24
+height = 32
+roi_start_position = (1020, 144)
+for index in range(10):
+    left = roi_start_position[0] + (width * index)
+    top = roi_start_position[1]
+    right = left + width
+    bottom = top + height
+    SCORE_ROIS.append((left, top, right, bottom))
+
+# 残機のROI配列(残1、残2、残3...の順)
+REMAIN_ROIS = []
+width = 24
+height = 32
+roi_start_position = (1046, 208)
+for index in range(9):
+    left = roi_start_position[0] + (width * index)
+    top = roi_start_position[1]
+    right = left + width
+    bottom = top + height
+    REMAIN_ROIS.append((left, top, right, bottom))
+
+# --------------------------------------------------
+
 
 @click.command()
-def main(init):
+def main():
 
     # コンフィグにexeファイルの設定が存在するか確認
     config = configparser.ConfigParser()
@@ -68,7 +98,7 @@ def main(init):
         # 東方地霊殿を起動
         th11_exe_dir = os.path.dirname(th11_exe_file)
         th11_exe_name = os.path.basename(th11_exe_file)
-        subprocess.Popen('cd /D ' + th11_exe_dir + ' && start ' + th11_exe_name, shell=True)
+        subprocess.Popen('cd /D ' + th11_exe_dir + ' && start ' + th11_exe_name, shell=True) # 移動してから起動しないと設定ファイルが読み込まれないみたい
         time.sleep(5)
 
         # ウィンドウ名でハンドル取得
@@ -82,7 +112,45 @@ def main(init):
 
     print(colored("東方地霊殿が起動してるよー", "green"))
     print(colored("東方地霊殿のハンドル：" + str(th11_handle), "green"))
+    print(colored("Ctrl+Cで終了します", "green"))
 
+    # とりあえず10秒毎に画面をキャプチャ
+    # スコア、残機の辺りを抽出する
+    # スコアの表示は確認したところ等間隔なので1文字ずつ抽出した方が簡単そう
+    try:
+        while(True):
+            time.sleep(10)
+
+            rect_left,rect_top,rect_right,rect_bottom = win32gui.GetWindowRect(th11_handle)
+
+            # ウィンドウの外枠＋数ピクセル余分にとれちゃうので1280x960の位置補正
+            cap_left = rect_left + 3
+            cap_top = rect_top + 26
+            cap_right = cap_left + 1280
+            cap_bottom = cap_top + 960
+
+            # 指定した領域内をクリッピング
+            current_time = datetime.now().strftime('%Y%m%d%H%M%S')
+            img = ImageGrab.grab(bbox=(cap_left,cap_top,cap_right,cap_bottom))
+            img.save(OUTPUT_DIR + current_time + '.png')
+            original_frame = np.array(img)
+
+            # スコアの数字を1つずつクリッピングして保存
+            for index, roi in enumerate(SCORE_ROIS):
+                clopped_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
+                file_name = OUTPUT_DIR + current_time + '_score_' + str(index) + '.png'
+                cv2.imwrite(file_name, clopped_frame)
+
+            # 残機の数字を1つずつクリッピングして保存
+            for index, roi in enumerate(REMAIN_ROIS):
+                clopped_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
+                file_name = OUTPUT_DIR + current_time + '_remain_' + str(index) + '.png'
+                cv2.imwrite(file_name, clopped_frame)
+
+
+    except KeyboardInterrupt:
+        print(colored("プログラムを終了します", "green"))
+        exit(0)
 
 if __name__ == '__main__':
     main()
