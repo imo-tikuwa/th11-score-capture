@@ -82,12 +82,11 @@ def main():
     print(colored("東方地霊殿のハンドル：" + str(th11_handle), "green"))
     print(colored("Ctrl+Cで終了します", "green"))
 
-    # とりあえず10秒毎に画面をキャプチャ
-    # スコア、残機の辺りを抽出する
+    # とりあえず5秒毎に画面をキャプチャ
     # スコアの表示は確認したところ等間隔なので1文字ずつ抽出した方が簡単そう
     try:
         while(True):
-            time.sleep(10)
+            time.sleep(5)
 
             rect_left,rect_top,rect_right,rect_bottom = win32gui.GetWindowRect(th11_handle)
 
@@ -103,27 +102,7 @@ def main():
             img.save(OUTPUT_DIR + current_time + '.png')
             original_frame = np.array(img)
 
-
-            # 二値化
-            work_frame = edit_frame(original_frame)
-
-            # スコアの数字についてテンプレートマッチング
-            score = analyze_score(work_frame)
-
-            # 残機についてテンプレートマッチング
-            remain = analyze_remain(work_frame)
-
-            # グレイズの数字についてテンプレートマッチング
-            graze = analyze_graze(work_frame)
-
-            # 難易度についてテンプレートマッチング
-            difficulty = analyze_difficulty(work_frame)
-
-            print('----- ' + current_time + '.png -----')
-            print("スコア　 ： " + str(score))
-            print("残機　　 ： " + str(remain))
-            print("グレイズ ： " + graze)
-            print("難易度　 ： " + convert_difficulty(difficulty))
+            get_sample_data(original_frame, current_time)
 
     except KeyboardInterrupt:
         print(colored("プログラムを終了します", "green"))
