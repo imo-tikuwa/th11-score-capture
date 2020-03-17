@@ -1,12 +1,23 @@
 
 import os
+import time
 import cv2
+import subprocess
 from datetime import datetime
 from PIL import Image
+import win32gui
+import tkinter, tkinter.filedialog, tkinter.messagebox
+# print出力に色付ける
+from termcolor import colored
+import colorama
+# 設定ファイルを利用する
+import configparser
+
 
 # 変数(定数扱いする変数)
 TH11_WINDOW_NAME = '東方地霊殿　～ Subterranean Animism. ver 1.00a'
 CONFIG_FILE_NAME = 'settings.ini'
+CONFIG_SECTION_NAME = 'config'
 OUTPUT_DIR = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'output' + os.sep
 SAMPLE_DIR = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'sample_data' + os.sep
 SAMPLE_NUMBERS_DIR = SAMPLE_DIR + 'number' + os.sep
@@ -77,6 +88,72 @@ BINARY_DIFFICULTIES = []
 for index in range(5):
     img = cv2.imread(SAMPLE_DIFFICULTIES_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
     BINARY_DIFFICULTIES.append(img)
+
+
+def config_init():
+    # コンフィグを初期化
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILE_NAME, 'cp932')
+
+    return config
+
+
+def execute_th11(config):
+    # 東方地霊殿を起動してハンドルを返す。
+    # 実行ファイルのパスが存在しない場合はダイアログを開き設定する
+    th11_handle = win32gui.FindWindow(None, TH11_WINDOW_NAME)
+    if th11_handle <= 0:
+
+        # 設定ファイルチェック(exeファイルの設定が存在するか確認)
+        th11_exe_file = ""
+        if config.has_section(CONFIG_SECTION_NAME):
+            th11_exe_file = config.get(CONFIG_SECTION_NAME, 'exe_path')
+            if not os.path.isfile(th11_exe_file):
+                th11_exe_file = ""
+
+        # ダイアログを開いて地霊殿の実行ファイルを指定してもらう
+        if th11_exe_file == "":
+            # th11.exe指定
+            root = tkinter.Tk()
+            root.withdraw()
+
+            file_type = [("東方地霊殿の実行ファイル", "th11.exe"),("全てのファイル", "*.*")]
+            initial_dir = os.path.abspath(os.path.dirname(__file__))
+            th11_exe_file = tkinter.filedialog.askopenfilename(filetypes=file_type, initialdir=initial_dir)
+
+            if th11_exe_file == "" or os.path.basename(th11_exe_file) != 'th11.exe':
+                print(colored("東方地霊殿の実行ファイルを指定してください。", "red"))
+                sys.exit(1)
+
+            # 設定ファイルにexeファイルのパス保存
+            if not config.has_section(CONFIG_SECTION_NAME):
+                config.add_section(CONFIG_SECTION_NAME)
+            config.set(CONFIG_SECTION_NAME, 'exe_path', th11_exe_file)
+
+            # ファイルに書き出し
+            with open(CONFIG_FILE_NAME, 'w') as config_file:
+                config.write(config_file)
+
+        # 東方地霊殿を起動
+        th11_exe_dir = os.path.dirname(th11_exe_file)
+        th11_exe_name = os.path.basename(th11_exe_file)
+        subprocess.Popen('cd /D ' + th11_exe_dir + ' && start ' + th11_exe_name, shell=True) # 移動してから起動しないと設定ファイルが読み込まれないみたい
+        time.sleep(5)
+
+        # ウィンドウ名でハンドル取得
+        while(True):
+            th11_handle = win32gui.FindWindow(None, TH11_WINDOW_NAME)
+            if th11_handle > 0:
+                break
+
+            print(colored("東方地霊殿が起動してないよー", "red"))
+            time.sleep(3)
+
+    print(colored("東方地霊殿が起動してるよー", "green"))
+    print(colored("東方地霊殿のハンドル：" + str(th11_handle), "green"))
+    print(colored("Ctrl+Cで終了します", "green"))
+
+    return th11_handle
 
 
 def edit_frame(frame):
