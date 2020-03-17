@@ -12,7 +12,6 @@ import sys
 from datetime import datetime
 # print出力に色付ける
 from termcolor import colored
-import colorama
 # 関数、定数をインポート
 from commons import *
 

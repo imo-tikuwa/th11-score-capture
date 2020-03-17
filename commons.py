@@ -10,6 +10,7 @@ import tkinter, tkinter.filedialog, tkinter.messagebox
 # print出力に色付ける
 from termcolor import colored
 import colorama
+colorama.init()
 # 設定ファイルを利用する
 import configparser
 
