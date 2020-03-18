@@ -24,6 +24,7 @@ SAMPLE_DIR = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'sample_data'
 SAMPLE_NUMBERS_DIR = SAMPLE_DIR + 'number' + os.sep
 SAMPLE_REMAINS_DIR = SAMPLE_DIR + 'remain' + os.sep
 SAMPLE_DIFFICULTIES_DIR = SAMPLE_DIR + 'difficulty' + os.sep
+SAMPLE_BOSSNAMES_DIR = SAMPLE_DIR + 'bossname' + os.sep
 DIFFICULTY_HASHMAP = {
                       None: '',
                       0: 'Easy',
@@ -31,6 +32,29 @@ DIFFICULTY_HASHMAP = {
                       2: 'Hard',
                       3: 'Lunatic',
                       4: 'Extra'
+}
+BOSSNAME_HASHMAP = {
+                      None: '',
+                      0: 'キスメ',
+                      1: '黒谷ヤマメ',
+                      2: '水橋パルスィ',
+                      3: '星熊勇儀',
+                      4: '古明地さとり',
+                      5: '火焔猫燐',
+                      6: '霊烏路空',
+                      7: '東風谷早苗',
+                      8: '古明地こいし'
+}
+BOSSNAME2STAGE_HASHMAP = {
+                          0: '1面',
+                          1: '1面',
+                          2: '2面',
+                          3: '3面',
+                          4: '4面',
+                          5: '5面',
+                          6: '6面',
+                          7: 'EX面',
+                          8: 'EX面',
 }
 
 # スコアのROI配列(10億、1億、1000万...の順)
@@ -72,6 +96,9 @@ for index in range(5):
 # 難易度のROI
 DIFFICULTY_ROI = (972, 37, 1136, 90)
 
+# ボス名のROI
+BOSSNAME_ROI = (76, 56, 246, 72)
+
 # スコアのサンプルデータ(0～9)
 BINARY_NUMBERS = []
 for index in range(10):
@@ -89,6 +116,14 @@ BINARY_DIFFICULTIES = []
 for index in range(5):
     img = cv2.imread(SAMPLE_DIFFICULTIES_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
     BINARY_DIFFICULTIES.append(img)
+
+# ボス名のサンプルデータ(キスメ～古明地こいし)
+# ボス名は単色なのでinRangeで色を指定して二値化してから使用する
+BINARY_BOSSNAMES = []
+for index in range(9):
+    img = cv2.imread(SAMPLE_BOSSNAMES_DIR + str(index) + '.png')
+    img = cv2.inRange(img, (255, 255, 119), (255, 255, 119))
+    BINARY_BOSSNAMES.append(img)
 
 
 def config_init():
@@ -183,7 +218,8 @@ def analyze_score(work_frame):
 
     score = "".join(map(str, score_results))
     # 1億未満のとき先頭に0がついてしまうので数値に変換
-    score = int(score)
+    if (score):
+        score = int(score)
 
     return score
 
@@ -252,6 +288,32 @@ def analyze_difficulty(work_frame):
     return difficulty
 
 
+def analyze_current(original_frame, work_frame):
+    # 現在の場所をテンプレートマッチングにより取得
+    # ボス名、ボス名下の星の数、スペルカード名などからキャプチャした画像がどこかを判定する
+    current = None
+
+    # ボス名は単色（R:119、G:255、B:255）なので色を指定して二値化することで完全一致に近いマッチングが可能
+    # 二値化の色指定について
+    # OpenCv(cv2)の色の並びはBGRだけど、ここのorifinal_frameはPillowで取得したRGB画像の配列データなのでRGBの順で指定
+    bossname_frame = original_frame[BOSSNAME_ROI[1]:BOSSNAME_ROI[3], BOSSNAME_ROI[0]:BOSSNAME_ROI[2]]
+    bossname_frame = cv2.inRange(bossname_frame, (119, 255, 255), (119, 255, 255))
+#     Image.fromarray(bossname_frame).save(OUTPUT_DIR + 'bossname.png')
+
+    bossname = None
+    for num, template_img in enumerate(BINARY_BOSSNAMES):
+        res = cv2.matchTemplate(bossname_frame, template_img, cv2.TM_CCORR_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+#         print(min_val, max_val, min_loc, max_loc)
+        if (max_val > 0.99):
+            bossname = num
+            break
+
+    # 暫定でボス名までセット
+    current = bossname
+    return current
+
+
 def get_sample_data(original_frame, current_time):
     # サンプルデータ用の切り抜いた画像を取得
 
@@ -284,3 +346,8 @@ def get_sample_data(original_frame, current_time):
 def convert_difficulty(difficulty):
     # 数値の難易度を文字列に変換
     return DIFFICULTY_HASHMAP[difficulty]
+
+
+def convert_bossname(bossname):
+    # 数値のボス名を文字列に変換
+    return BOSSNAME_HASHMAP[bossname]

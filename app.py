@@ -61,11 +61,15 @@ def main():
             # 難易度についてテンプレートマッチング
             difficulty = analyze_difficulty(work_frame)
 
+            # 現在の場所についてテンプレートマッチング
+            current = analyze_current(original_frame, work_frame)
+
             print('----- ' + current_time + '.png -----')
             print("スコア　 ： " + str(score))
             print("残機　　 ： " + str(remain))
             print("グレイズ ： " + graze)
             print("難易度　 ： " + convert_difficulty(difficulty))
+            print("現在　　 ： " + convert_bossname(current))
 
     except KeyboardInterrupt:
         print(colored("プログラムを終了します", "green"))
