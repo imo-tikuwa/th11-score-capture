@@ -24,37 +24,53 @@ SAMPLE_DIR = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'sample_data'
 SAMPLE_NUMBERS_DIR = SAMPLE_DIR + 'number' + os.sep
 SAMPLE_REMAINS_DIR = SAMPLE_DIR + 'remain' + os.sep
 SAMPLE_DIFFICULTIES_DIR = SAMPLE_DIR + 'difficulty' + os.sep
-SAMPLE_BOSSNAMES_DIR = SAMPLE_DIR + 'bossname' + os.sep
+SAMPLE_BOSS_NAMES_DIR = SAMPLE_DIR + 'boss_name' + os.sep
+SAMPLE_BOSS_REMAINS_DIR = SAMPLE_DIR + 'boss_remain' + os.sep
+DIFFICULTY_EASY = 0
+DIFFICULTY_NORMAL = 1
+DIFFICULTY_HARD = 2
+DIFFICULTY_LUNATIC = 3
+DIFFICULTY_EXTRA = 4
 DIFFICULTY_HASHMAP = {
                       None: '',
-                      0: 'Easy',
-                      1: 'Normal',
-                      2: 'Hard',
-                      3: 'Lunatic',
-                      4: 'Extra'
+                      DIFFICULTY_EASY: 'Easy',
+                      DIFFICULTY_NORMAL: 'Normal',
+                      DIFFICULTY_HARD: 'Hard',
+                      DIFFICULTY_LUNATIC: 'Lunatic',
+                      DIFFICULTY_EXTRA: 'Extra'
 }
-BOSSNAME_HASHMAP = {
+BOSS_KISUME = 0
+BOSS_YAMAME = 1
+BOSS_PARSEE = 2
+BOSS_YUGI = 3
+BOSS_SATORI = 4
+BOSS_ORIN = 5
+BOSS_UTSUHO = 6
+BOSS_SANAE = 7
+BOSS_KOISHI = 8
+BOSS_NAME_HASHMAP = {
                       None: '',
-                      0: 'キスメ',
-                      1: '黒谷ヤマメ',
-                      2: '水橋パルスィ',
-                      3: '星熊勇儀',
-                      4: '古明地さとり',
-                      5: '火焔猫燐',
-                      6: '霊烏路空',
-                      7: '東風谷早苗',
-                      8: '古明地こいし'
+                      BOSS_KISUME: 'キスメ',
+                      BOSS_YAMAME: '黒谷ヤマメ',
+                      BOSS_PARSEE: '水橋パルスィ',
+                      BOSS_YUGI: '星熊勇儀',
+                      BOSS_SATORI: '古明地さとり',
+                      BOSS_ORIN: '火焔猫燐',
+                      BOSS_UTSUHO: '霊烏路空',
+                      BOSS_SANAE: '東風谷早苗',
+                      BOSS_KOISHI: '古明地こいし'
 }
 BOSSNAME2STAGE_HASHMAP = {
-                          0: '1面',
-                          1: '1面',
-                          2: '2面',
-                          3: '3面',
-                          4: '4面',
-                          5: '5面',
-                          6: '6面',
-                          7: 'EX面',
-                          8: 'EX面',
+                          None: '',
+                          BOSS_KISUME: '1面',
+                          BOSS_YAMAME: '1面',
+                          BOSS_PARSEE: '2面',
+                          BOSS_YUGI: '3面',
+                          BOSS_SATORI: '4面',
+                          BOSS_ORIN: '5面',
+                          BOSS_UTSUHO: '6面',
+                          BOSS_SANAE: 'EX面',
+                          BOSS_KOISHI: 'EX面',
 }
 
 # スコアのROI配列(10億、1億、1000万...の順)
@@ -97,7 +113,21 @@ for index in range(5):
 DIFFICULTY_ROI = (972, 37, 1136, 90)
 
 # ボス名のROI
-BOSSNAME_ROI = (76, 56, 246, 72)
+BOSS_NAME_ROI = (76, 56, 246, 72)
+
+# ボス残機のROI配列
+BOSS_REMAIN_ROIS =[]
+width = 18
+height = 18
+roi_start_position = (72, 74)
+padding = 2 # 星と星の間の間隔
+for index in range(9):
+    left = roi_start_position[0] + (width * index) + (padding * index)
+    top = roi_start_position[1]
+    right = left + width
+    bottom = top + height
+    BOSS_REMAIN_ROIS.append((left, top, right, bottom))
+
 
 # スコアのサンプルデータ(0～9)
 BINARY_NUMBERS = []
@@ -119,11 +149,16 @@ for index in range(5):
 
 # ボス名のサンプルデータ(キスメ～古明地こいし)
 # ボス名は単色なのでinRangeで色を指定して二値化してから使用する
-BINARY_BOSSNAMES = []
+BINARY_BOSS_NAMES = []
 for index in range(9):
-    img = cv2.imread(SAMPLE_BOSSNAMES_DIR + str(index) + '.png')
+    img = cv2.imread(SAMPLE_BOSS_NAMES_DIR + str(index) + '.png')
     img = cv2.inRange(img, (255, 255, 119), (255, 255, 119))
-    BINARY_BOSSNAMES.append(img)
+    BINARY_BOSS_NAMES.append(img)
+
+# ボス残機のサンプルデータ(緑色の星画像で固定)
+# ボス残機は薄い緑（R:233、G:244、B:225）～濃い緑（R:89、G:172、B:21）なので色を指定して二値化してから使用する
+BINARY_BOSS_REMAIN = cv2.imread(SAMPLE_BOSS_REMAINS_DIR + '0.png')
+BINARY_BOSS_REMAIN = cv2.inRange(BINARY_BOSS_REMAIN, (21, 172, 89), (225, 244, 233))
 
 
 def config_init():
@@ -288,30 +323,56 @@ def analyze_difficulty(work_frame):
     return difficulty
 
 
-def analyze_current(original_frame, work_frame):
-    # 現在の場所をテンプレートマッチングにより取得
-    # ボス名、ボス名下の星の数、スペルカード名などからキャプチャした画像がどこかを判定する
-    current = None
+def analyze_boss_name(original_frame):
+    # ボス名をテンプレートマッチングにより取得
+    boss_name = None
 
     # ボス名は単色（R:119、G:255、B:255）なので色を指定して二値化することで完全一致に近いマッチングが可能
     # 二値化の色指定について
     # OpenCv(cv2)の色の並びはBGRだけど、ここのorifinal_frameはPillowで取得したRGB画像の配列データなのでRGBの順で指定
-    bossname_frame = original_frame[BOSSNAME_ROI[1]:BOSSNAME_ROI[3], BOSSNAME_ROI[0]:BOSSNAME_ROI[2]]
-    bossname_frame = cv2.inRange(bossname_frame, (119, 255, 255), (119, 255, 255))
-#     Image.fromarray(bossname_frame).save(OUTPUT_DIR + 'bossname.png')
+    boss_name_frame = original_frame[BOSS_NAME_ROI[1]:BOSS_NAME_ROI[3], BOSS_NAME_ROI[0]:BOSS_NAME_ROI[2]]
+    boss_name_frame = cv2.inRange(boss_name_frame, (119, 255, 255), (119, 255, 255))
+#     Image.fromarray(boss_name_frame).save(OUTPUT_DIR + 'boss_name.png')
 
-    bossname = None
-    for num, template_img in enumerate(BINARY_BOSSNAMES):
-        res = cv2.matchTemplate(bossname_frame, template_img, cv2.TM_CCORR_NORMED)
+    for num, template_img in enumerate(BINARY_BOSS_NAMES):
+        res = cv2.matchTemplate(boss_name_frame, template_img, cv2.TM_CCORR_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 #         print(min_val, max_val, min_loc, max_loc)
         if (max_val > 0.99):
-            bossname = num
+            boss_name = num
             break
 
-    # 暫定でボス名までセット
-    current = bossname
-    return current
+    return boss_name
+
+
+def analyze_boss_remain(original_frame):
+    # ボス残機をテンプレートマッチングにより取得
+    boss_remain = None
+
+    # ボス残機は薄い緑（R:233、G:244、B:225）～濃い緑（R:89、G:172、B:21）なので色を指定して二値化する
+    # 二値化の色指定について
+    # OpenCv(cv2)の色の並びはBGRだけど、ここのorifinal_frameはPillowで取得したRGB画像の配列データなのでRGBの順で指定
+    for index, roi in enumerate(BOSS_REMAIN_ROIS):
+        boss_remain_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
+        boss_remain_frame = cv2.inRange(boss_remain_frame, (89, 172, 21), (233, 244, 225))
+#         Image.fromarray(boss_remain_frame).save(OUTPUT_DIR + str(index) + 'boss_remain.png')
+
+        res = cv2.matchTemplate(boss_remain_frame, BINARY_BOSS_REMAIN, cv2.TM_CCORR_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+#         print(min_val, max_val, min_loc, max_loc)
+
+        # 画面の左側から探索してるため見つからない場合は誤検出でない限りは次も見つからない(存在しない)ため処理を抜ける
+        # ボス残機は1色ではないため星の下に入り込んだ弾幕の色なんかによって類似度が下がりがち
+        # そのため少し許容する値を落とす
+        # 星の中の一番多い単色とかに変えた方が類似度上がるかもしれない
+        if (max_val < 0.8):
+            break
+
+        if (boss_remain is None):
+            boss_remain = 0
+        boss_remain += 1
+
+    return boss_remain
 
 
 def get_sample_data(original_frame, current_time):
@@ -348,6 +409,11 @@ def convert_difficulty(difficulty):
     return DIFFICULTY_HASHMAP[difficulty]
 
 
-def convert_bossname(bossname):
+def convert_boss_name(boss_name):
     # 数値のボス名を文字列に変換
-    return BOSSNAME_HASHMAP[bossname]
+    return BOSS_NAME_HASHMAP[boss_name]
+
+def convert_boss_remain(boss_remain):
+    if (boss_remain is None):
+        return ''
+    return str(boss_remain)

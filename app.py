@@ -16,7 +16,8 @@ from termcolor import colored
 from commons import *
 
 @click.command()
-def main():
+@click.option('--development','-dev',is_flag=True) # 開発モードのとき解析に使用した画像を保管する
+def main(development):
 
     # コンフィグ初期化
     config = config_init()
@@ -24,12 +25,12 @@ def main():
     # 地霊殿のハンドルを起動、起動してなかったら起動
     th11_handle = execute_th11(config)
 
-    # とりあえず10秒毎に画面をキャプチャ
+    # とりあえず5秒毎に画面をキャプチャ
     # スコア、残機の辺りを抽出する
     # スコアの表示は確認したところ等間隔なので1文字ずつ抽出した方が簡単そう
     try:
         while(True):
-            time.sleep(10)
+            time.sleep(5)
 
             rect_left,rect_top,rect_right,rect_bottom = win32gui.GetWindowRect(th11_handle)
 
@@ -40,9 +41,10 @@ def main():
             cap_bottom = cap_top + 960
 
             # 指定した領域内をクリッピング
-            current_time = datetime.now().strftime('%Y%m%d%H%M%S')
-            img = ImageGrab.grab(bbox=(cap_left,cap_top,cap_right,cap_bottom))
-            img.save(OUTPUT_DIR + current_time + '.png')
+            current_time = datetime.now().strftime('%Y%m%d%H%M%S%f')
+            img = ImageGrab.grab(bbox=(cap_left, cap_top, cap_right, cap_bottom))
+            if development:
+                img.save(OUTPUT_DIR + current_time + '.png')
             original_frame = np.array(img)
 
 
@@ -61,15 +63,19 @@ def main():
             # 難易度についてテンプレートマッチング
             difficulty = analyze_difficulty(work_frame)
 
-            # 現在の場所についてテンプレートマッチング
-            current = analyze_current(original_frame, work_frame)
+            # ボス名についてテンプレートマッチング
+            boss_name = analyze_boss_name(original_frame)
+
+            # ボス残機についてテンプレートマッチング
+            boss_remain = analyze_boss_remain(original_frame)
 
             print('----- ' + current_time + '.png -----')
             print("スコア　 ： " + str(score))
             print("残機　　 ： " + str(remain))
             print("グレイズ ： " + graze)
             print("難易度　 ： " + convert_difficulty(difficulty))
-            print("現在　　 ： " + convert_bossname(current))
+            print("ボス　　 ： " + convert_boss_name(boss_name))
+            print("ボス残機 ： " + convert_boss_remain(boss_remain))
 
     except KeyboardInterrupt:
         print(colored("プログラムを終了します", "green"))
