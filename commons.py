@@ -227,6 +227,16 @@ def execute_th11(config):
     return th11_handle
 
 
+def ajust_capture_position(rect_left, rect_top, rect_right, rect_bottom):
+    # キャプチャ位置修正
+    cap_left = rect_left + 8
+    cap_top = rect_top + 26
+    cap_right = cap_left + 1280
+    cap_bottom = cap_top + 960
+
+    return cap_left, cap_top, cap_right, cap_bottom
+
+
 def edit_frame(frame):
     # フレームを二値化
     work_frame = frame
@@ -375,35 +385,6 @@ def analyze_boss_remain(original_frame):
     return boss_remain
 
 
-def get_sample_data(original_frame, current_time):
-    # サンプルデータ用の切り抜いた画像を取得
-
-    # スコアの画像を保存（グレイズにも使用）
-    for index, roi in enumerate(SCORE_ROIS):
-        clopped_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
-        file_name = OUTPUT_DIR + current_time + '_score_' + str(index) + '.png'
-        # OpenCvはBGR、PillowはRGBなのでOpenCvで保存するときはモードを指定しないと色が変わってしまう
-#         clopped_frame = cv2.cvtColor(clopped_frame, cv2.COLOR_BGR2RGB)
-#         cv2.imwrite(file_name, clopped_frame)
-        # Pillowで保存
-        Image.fromarray(clopped_frame).save(file_name)
-
-    # 残機の画像を保存
-    for index, roi in enumerate(REMAIN_ROIS):
-        clopped_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
-        file_name = OUTPUT_DIR + current_time + '_remain_' + str(index) + '.png'
-        Image.fromarray(clopped_frame).save(file_name)
-
-    # 難易度の画像を保存
-    roi = (990, 44, 1130, 84)
-    clopped_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
-    file_name = OUTPUT_DIR + current_time + '_difficulty.png'
-    Image.fromarray(clopped_frame).save(file_name)
-
-    print("取得しました")
-    return
-
-
 def convert_difficulty(difficulty):
     # 数値の難易度を文字列に変換
     return DIFFICULTY_HASHMAP[difficulty]
@@ -412,6 +393,7 @@ def convert_difficulty(difficulty):
 def convert_boss_name(boss_name):
     # 数値のボス名を文字列に変換
     return BOSS_NAME_HASHMAP[boss_name]
+
 
 def convert_boss_remain(boss_remain):
     if (boss_remain is None):

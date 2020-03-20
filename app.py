@@ -14,6 +14,8 @@ from datetime import datetime
 from termcolor import colored
 # 関数、定数をインポート
 from commons import *
+# CSV出力
+# import csv
 
 @click.command()
 @click.option('--development','-dev',is_flag=True) # 開発モードのとき解析に使用した画像を保管する
@@ -32,13 +34,10 @@ def main(development):
         while(True):
             time.sleep(5)
 
-            rect_left,rect_top,rect_right,rect_bottom = win32gui.GetWindowRect(th11_handle)
+            rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
 
             # ウィンドウの外枠＋数ピクセル余分にとれちゃうので1280x960の位置補正
-            cap_left = rect_left + 3
-            cap_top = rect_top + 26
-            cap_right = cap_left + 1280
-            cap_bottom = cap_top + 960
+            cap_left, cap_top, cap_right, cap_bottom = ajust_capture_position(rect_left, rect_top, rect_right, rect_bottom)
 
             # 指定した領域内をクリッピング
             current_time = datetime.now().strftime('%Y%m%d%H%M%S%f')
@@ -80,6 +79,12 @@ def main(development):
     except KeyboardInterrupt:
         print(colored("プログラムを終了します", "green"))
         exit(0)
+
+    # CSV出力
+#     csv_data = [[1234, 1, 100, 'Lunatic', '', ''],[12345, 1.2, 200, 'Lunatic', '', '']]
+#     with open(OUTPUT_DIR + datetime.now().strftime('%Y%m%d%H%M%S') + '.csv', 'w') as file:
+#         writer = csv.writer(file)
+#         writer.writerows(csv_data)
 
 if __name__ == '__main__':
     main()

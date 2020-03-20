@@ -30,13 +30,10 @@ def main():
         while(True):
             time.sleep(5)
 
-            rect_left,rect_top,rect_right,rect_bottom = win32gui.GetWindowRect(th11_handle)
+            rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
 
             # ウィンドウの外枠＋数ピクセル余分にとれちゃうので1280x960の位置補正
-            cap_left = rect_left + 3
-            cap_top = rect_top + 26
-            cap_right = cap_left + 1280
-            cap_bottom = cap_top + 960
+            cap_left, cap_top, cap_right, cap_bottom = ajust_capture_position(rect_left, rect_top, rect_right, rect_bottom)
 
             # 指定した領域内をクリッピング
             current_time = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -44,7 +41,29 @@ def main():
             img.save(OUTPUT_DIR + current_time + '.png')
             original_frame = np.array(img)
 
-            get_sample_data(original_frame, current_time)
+            # スコアの画像を保存（グレイズにも使用）
+            for index, roi in enumerate(SCORE_ROIS):
+                clopped_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
+                file_name = OUTPUT_DIR + current_time + '_score_' + str(index) + '.png'
+                # OpenCvはBGR、PillowはRGBなのでOpenCvで保存するときはモードを指定しないと色が変わってしまう
+#                 clopped_frame = cv2.cvtColor(clopped_frame, cv2.COLOR_BGR2RGB)
+#                 cv2.imwrite(file_name, clopped_frame)
+                # Pillowで保存
+                Image.fromarray(clopped_frame).save(file_name)
+
+            # 残機の画像を保存
+            for index, roi in enumerate(REMAIN_ROIS):
+                clopped_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
+                file_name = OUTPUT_DIR + current_time + '_remain_' + str(index) + '.png'
+                Image.fromarray(clopped_frame).save(file_name)
+
+            # 難易度の画像を保存
+            roi = (990, 44, 1130, 84)
+            clopped_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
+            file_name = OUTPUT_DIR + current_time + '_difficulty.png'
+            Image.fromarray(clopped_frame).save(file_name)
+
+            print("スコア、残機、難易度のサンプルデータを取得しました")
 
     except KeyboardInterrupt:
         print(colored("プログラムを終了します", "green"))

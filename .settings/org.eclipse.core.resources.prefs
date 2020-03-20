@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
 encoding/app.py=utf-8
 encoding/get_sample_data.py=utf-8
+encoding/get_spell_card_data.py=utf-8
 encoding/settings.ini=SJIS
