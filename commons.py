@@ -87,6 +87,28 @@ BOSS_SHORT_NAME_HASHMAP = {
                       BOSS_SANAE: 'sanae',
                       BOSS_KOISHI: 'koishi'
 }
+SPELL_CARD_NAME_HASHMAP = {
+                           None: '',
+                           'easy': [],
+                           'normal': [],
+                           'hard': [],
+                           'lunatic': [],
+                           'extra': [
+                                     '秘法「九字刺し」',
+                                     '奇跡「ミラクルフルーツ」',
+                                     '神徳「五穀豊穣ライスシャワー」',
+                                     '表象「夢枕にご先祖総立ち」',
+                                     '表象「弾幕パラノイア」',
+                                     '本能「イドの解放」',
+                                     '抑制「スーパーエゴ」',
+                                     '反応「妖怪ポリグラフ」',
+                                     '無意識「弾幕のロールシャッハ」',
+                                     '復燃「恋の埋火」',
+                                     '深層「無意識の遺伝子」',
+                                     '「嫌われ者のフィロソフィ」',
+                                     '「サブタレイニアンローズ」'
+                                     ]
+}
 
 # スコアのROI配列(10億、1億、1000万...の順)
 SCORE_ROIS = []
@@ -181,6 +203,9 @@ SPELL_CARD_ROI = (340, 64, 820, 97)
 # スペルカードのサンプルデータ(難易度を元に動的に切り替え)
 BINARY_SPELL_CARDS = []
 
+# スペルカード名情報(BINARY_SPELL_CARDSと同じタイミングで定義)
+SPELL_CARD_NAMES = []
+
 
 def config_init():
     # コンフィグを初期化
@@ -250,7 +275,7 @@ def execute_th11(config):
 
 def ajust_capture_position(rect_left, rect_top, rect_right, rect_bottom):
     # キャプチャ位置修正
-    cap_left = rect_left + 8
+    cap_left = rect_left + 3
     cap_top = rect_top + 26
     cap_right = cap_left + 1280
     cap_bottom = cap_top + 960
@@ -273,6 +298,7 @@ def analyze_score(work_frame):
     score_results = []
     for index, roi in enumerate(SCORE_ROIS):
         clopped_frame = work_frame[roi[1]:roi[3], roi[0]:roi[2]]
+        cv2.imwrite(OUTPUT_DIR + 'per_score' + str(index) + '.png', clopped_frame)
 
         for num, template_img in enumerate(BINARY_NUMBERS):
             res = cv2.matchTemplate(clopped_frame, template_img, cv2.TM_CCORR_NORMED)
@@ -409,7 +435,9 @@ def analyze_boss_remain(original_frame):
 def load_spell_card_binaries(difficulty):
     # スペルカードのサンプルデータ読み込み
     global BINARY_SPELL_CARDS
+    global SPELL_CARD_NAMES
     BINARY_SPELL_CARDS = []
+    SPELL_CARD_NAMES = []
 
     # 難易度名取得(easy～extra)
     difficulty_name = ''
@@ -424,12 +452,28 @@ def load_spell_card_binaries(difficulty):
         img = cv2.imread(SAMPLE_SPELL_CARDS_DIR + difficulty_name + '_' + str(index).zfill(2) + '.png', cv2.IMREAD_GRAYSCALE)
         BINARY_SPELL_CARDS.append(img)
 
+    # スペルカード名のマップ初期化
+    SPELL_CARD_NAMES = SPELL_CARD_NAME_HASHMAP[difficulty_name]
+
     return BINARY_SPELL_CARDS # app内では使わない(予定)だけど返しておく
 
 
 def analyze_spell_card(original_frame):
     # スペルカードをテンプレートマッチングにより取得
     spell_card = None
+    clopped_frame = original_frame[SPELL_CARD_ROI[1]:SPELL_CARD_ROI[3], SPELL_CARD_ROI[0]:SPELL_CARD_ROI[2]]
+    clopped_frame = cv2.cvtColor(clopped_frame, cv2.COLOR_RGB2GRAY)
+#     cv2.imwrite(OUTPUT_DIR + 'grayscale_spell_card.png', clopped_frame)
+
+    for num, template_img in enumerate(BINARY_SPELL_CARDS):
+        res = cv2.matchTemplate(clopped_frame, template_img, cv2.TM_CCORR_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+#         print(min_val, max_val, min_loc, max_loc)
+
+        # 閾値は暫定
+        if (max_val > 0.85):
+            spell_card = num
+            break
 
     return spell_card
 
@@ -445,10 +489,14 @@ def convert_boss_name(boss_name):
 
 
 def convert_boss_remain(boss_remain):
+    # ボス残機を文字列に変換
     if (boss_remain is None):
         return ''
     return str(boss_remain)
 
 
 def convert_spell_card(spell_card):
-    return 'hoge'
+    # スペルカードを文字列に変換
+    if (spell_card is not None and spell_card < len(SPELL_CARD_NAMES)):
+        return SPELL_CARD_NAMES[spell_card]
+    return ''
