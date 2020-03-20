@@ -31,6 +31,7 @@ def main(development):
     # スコア、残機の辺りを抽出する
     # スコアの表示は確認したところ等間隔なので1文字ずつ抽出した方が簡単そう
     try:
+        current_difficulty = None
         while(True):
             time.sleep(5)
 
@@ -50,6 +51,18 @@ def main(development):
             # 二値化
             work_frame = edit_frame(original_frame)
 
+            # 難易度についてテンプレートマッチング
+            difficulty = analyze_difficulty(work_frame)
+
+            # 難易度が見つからないとき後続の処理を全てスキップ
+            if (difficulty is None):
+                continue
+
+            # 初めて難易度を見つけたとき or 難易度が変更されたのが確認できたときスペルカードのサンプルデータを初期化
+            if (current_difficulty is None or difficulty != current_difficulty):
+                current_difficulty = difficulty
+                load_spell_card_binaries(difficulty)
+
             # スコアの数字についてテンプレートマッチング
             score = analyze_score(work_frame)
 
@@ -59,14 +72,14 @@ def main(development):
             # グレイズの数字についてテンプレートマッチング
             graze = analyze_graze(work_frame)
 
-            # 難易度についてテンプレートマッチング
-            difficulty = analyze_difficulty(work_frame)
-
             # ボス名についてテンプレートマッチング
             boss_name = analyze_boss_name(original_frame)
 
             # ボス残機についてテンプレートマッチング
             boss_remain = analyze_boss_remain(original_frame)
+
+            # スペルカードについてテンプレートマッチング
+            spell_card = analyze_spell_card(original_frame)
 
             print('----- ' + current_time + '.png -----')
             print("スコア　 ： " + str(score))
@@ -75,6 +88,7 @@ def main(development):
             print("難易度　 ： " + convert_difficulty(difficulty))
             print("ボス　　 ： " + convert_boss_name(boss_name))
             print("ボス残機 ： " + convert_boss_remain(boss_remain))
+            print("スペル　 ： " + convert_spell_card(spell_card))
 
     except KeyboardInterrupt:
         print(colored("プログラムを終了します", "green"))

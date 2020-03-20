@@ -40,8 +40,7 @@ def main():
         original_frame = np.array(img)
 
         # スペルカードのの画像を保存
-        roi = (340, 64, 820, 97)
-        clopped_frame = original_frame[roi[1]:roi[3], roi[0]:roi[2]]
+        clopped_frame = original_frame[SPELL_CARD_ROI[1]:SPELL_CARD_ROI[3], SPELL_CARD_ROI[0]:SPELL_CARD_ROI[2]]
         file_name = OUTPUT_DIR + current_time + '_spell.png'
         Image.fromarray(clopped_frame).save(file_name)
 

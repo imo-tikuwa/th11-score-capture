@@ -13,6 +13,8 @@ import colorama
 colorama.init()
 # 設定ファイルを利用する
 import configparser
+# スペルカードディレクトリ内の特定のファイル数をカウントするのに利用
+import glob
 
 
 # 変数(定数扱いする変数)
@@ -26,6 +28,7 @@ SAMPLE_REMAINS_DIR = SAMPLE_DIR + 'remain' + os.sep
 SAMPLE_DIFFICULTIES_DIR = SAMPLE_DIR + 'difficulty' + os.sep
 SAMPLE_BOSS_NAMES_DIR = SAMPLE_DIR + 'boss_name' + os.sep
 SAMPLE_BOSS_REMAINS_DIR = SAMPLE_DIR + 'boss_remain' + os.sep
+SAMPLE_SPELL_CARDS_DIR = SAMPLE_DIR + 'spell_card' + os.sep
 DIFFICULTY_EASY = 0
 DIFFICULTY_NORMAL = 1
 DIFFICULTY_HARD = 2
@@ -71,6 +74,18 @@ BOSSNAME2STAGE_HASHMAP = {
                           BOSS_UTSUHO: '6面',
                           BOSS_SANAE: 'EX面',
                           BOSS_KOISHI: 'EX面',
+}
+BOSS_SHORT_NAME_HASHMAP = {
+                      None: '',
+                      BOSS_KISUME: 'kisume',
+                      BOSS_YAMAME: 'yamame',
+                      BOSS_PARSEE: 'parsee',
+                      BOSS_YUGI: 'yugi',
+                      BOSS_SATORI: 'satori',
+                      BOSS_ORIN: 'orin',
+                      BOSS_UTSUHO: 'utsuho',
+                      BOSS_SANAE: 'sanae',
+                      BOSS_KOISHI: 'koishi'
 }
 
 # スコアのROI配列(10億、1億、1000万...の順)
@@ -159,6 +174,12 @@ for index in range(9):
 # ボス残機は薄い緑（R:233、G:244、B:225）～濃い緑（R:89、G:172、B:21）なので色を指定して二値化してから使用する
 BINARY_BOSS_REMAIN = cv2.imread(SAMPLE_BOSS_REMAINS_DIR + '0.png')
 BINARY_BOSS_REMAIN = cv2.inRange(BINARY_BOSS_REMAIN, (21, 172, 89), (225, 244, 233))
+
+# スペルカードのROI
+SPELL_CARD_ROI = (340, 64, 820, 97)
+
+# スペルカードのサンプルデータ(難易度を元に動的に切り替え)
+BINARY_SPELL_CARDS = []
 
 
 def config_init():
@@ -385,6 +406,34 @@ def analyze_boss_remain(original_frame):
     return boss_remain
 
 
+def load_spell_card_binaries(difficulty):
+    # スペルカードのサンプルデータ読み込み
+    global BINARY_SPELL_CARDS
+    BINARY_SPELL_CARDS = []
+
+    # 難易度名取得(easy～extra)
+    difficulty_name = ''
+    if difficulty in DIFFICULTY_HASHMAP:
+        difficulty_name = str.lower(DIFFICULTY_HASHMAP[difficulty])
+
+    # 難易度名で始まるファイルの数を取得
+    spell_card_len = len(glob.glob(SAMPLE_SPELL_CARDS_DIR + difficulty_name + '_*.png'))
+
+    # 難易度に対応したスペルカードのサンプルデータのみグレースケールで読み込み
+    for index in range(spell_card_len):
+        img = cv2.imread(SAMPLE_SPELL_CARDS_DIR + difficulty_name + '_' + str(index).zfill(2) + '.png', cv2.IMREAD_GRAYSCALE)
+        BINARY_SPELL_CARDS.append(img)
+
+    return BINARY_SPELL_CARDS # app内では使わない(予定)だけど返しておく
+
+
+def analyze_spell_card(original_frame):
+    # スペルカードをテンプレートマッチングにより取得
+    spell_card = None
+
+    return spell_card
+
+
 def convert_difficulty(difficulty):
     # 数値の難易度を文字列に変換
     return DIFFICULTY_HASHMAP[difficulty]
@@ -399,3 +448,7 @@ def convert_boss_remain(boss_remain):
     if (boss_remain is None):
         return ''
     return str(boss_remain)
+
+
+def convert_spell_card(spell_card):
+    return 'hoge'
