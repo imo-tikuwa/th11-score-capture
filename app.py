@@ -26,7 +26,7 @@ def main(development, output):
     results = []
     try:
         current_difficulty = None
-        sleep_second = 3
+        sleep_second = SLEEP_SECOND
         while(True):
             if (sleep_second > 0):
                 time.sleep(sleep_second)
@@ -73,6 +73,10 @@ def main(development, output):
             # スペルカードについてテンプレートマッチング
             spell_card = analyze_spell_card(original_frame, boss_name)
 
+            # 矛盾した状態が発生したときスキップする
+            if (inconsistency_check(output, difficulty, boss_name, boss_remain, spell_card) is False):
+                continue
+
             # ラストスペルのときステージクリアの瞬間をキャプチャするため一時的に処理間隔を0.5秒に変更
             is_last_spell = check_is_last_spell(spell_card)
             if (is_last_spell):
@@ -81,7 +85,7 @@ def main(development, output):
             # ステージクリアについてテンプレートマッチング
             is_stage_clear = analyze_stage_clear(work_frame)
             if (is_stage_clear):
-                sleep_second = 3
+                sleep_second = SLEEP_SECOND
 
             # ステージクリア判定
             current_position = convert_stage_clear(is_stage_clear)
@@ -119,8 +123,29 @@ def main(development, output):
             if (current_index < len(results) - 1):
                 next = results[current_index + 1]
 
+            # currentとprevのcurrent_positionが「STAGE CLEAR」のとき最終スコアを記録するため例外として古いもの(current)を残すようにする
+            if (current[CSV_INDEX_CURRENT_POSITION] == STAGE_CLEAR_TXT
+                and prev is not None
+                and prev[CSV_INDEX_CURRENT_POSITION] == STAGE_CLEAR_TXT
+                ):
+                continue
+
+            # currentとnextのcurrent_positionが「STAGE CLEAR」のとき最終スコアを記録するため
+            # 例外として古いもの(current)を残すようnext側を削除
+            if (current[CSV_INDEX_CURRENT_POSITION] == STAGE_CLEAR_TXT
+                and next is not None
+                and next[CSV_INDEX_CURRENT_POSITION] == STAGE_CLEAR_TXT
+                ):
+                del results[current_index + 1]
+                continue
+
             # prevのレコードとcurrentのレコードのボス名、ボス残機、スペルカードが一致していたらcurrentは重複と見なして削除
-            if (prev is not None and current[CSV_INDEX_BOSS_NAME] == prev[CSV_INDEX_BOSS_NAME] and current[CSV_INDEX_BOSS_REMAIN] == prev[CSV_INDEX_BOSS_REMAIN] and current[CSV_INDEX_SPELL_CARD] == prev[CSV_INDEX_SPELL_CARD]):
+            if (prev is not None
+                 and current[CSV_INDEX_BOSS_NAME] == prev[CSV_INDEX_BOSS_NAME]
+                 and current[CSV_INDEX_BOSS_REMAIN] == prev[CSV_INDEX_BOSS_REMAIN]
+                 and current[CSV_INDEX_SPELL_CARD] == prev[CSV_INDEX_SPELL_CARD]
+                 and current[CSV_INDEX_CURRENT_POSITION] != STAGE_CLEAR_TXT
+                 ):
                 del results[current_index]
                 continue
 

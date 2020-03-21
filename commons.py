@@ -33,6 +33,8 @@ SAMPLE_BOSS_NAMES_DIR = SAMPLE_DIR + 'boss_name' + os.sep
 SAMPLE_BOSS_REMAINS_DIR = SAMPLE_DIR + 'boss_remain' + os.sep
 SAMPLE_SPELL_CARDS_DIR = SAMPLE_DIR + 'spell_card' + os.sep
 SAMPLE_STAGE_CLEARS_DIR = SAMPLE_DIR + 'stage_clear' + os.sep
+SLEEP_SECOND = 3
+STAGE_CLEAR_TXT = 'STAGE CLEAR'
 DIFFICULTY_EASY = 0
 DIFFICULTY_NORMAL = 1
 DIFFICULTY_HARD = 2
@@ -301,6 +303,219 @@ SPELL_CARD_NAME_DICTIONARY = {
                                        10: '深層「無意識の遺伝子」',
                                        11: '「嫌われ者のフィロソフィ」',
                                        12: '「サブタレイニアンローズ」',
+                                       }
+}
+# スペルカードとボス残機のマッピングデータ
+SPELL_CARD_AND_REMAIN_DICTIONARY = {
+                           None: '',
+                           DIFFICULTY_EASY:    {
+                                       # stage1
+                                       0:  1, # 罠符「キャプチャーウェブ」
+                                       1:  None, # 瘴符「フィルドミアズマ」
+                                       # stage2
+                                       2:  None, # 妬符「グリーンアイドモンスター」
+                                       3:  1, # 花咲爺「華やかなる仁者への嫉妬」
+                                       4:  None, # 舌切雀「謙虚なる富者への片恨」
+                                       5:  None, # 恨符「丑の刻参り」
+                                       # stage3
+                                       6:  None, # 鬼符「怪力乱神」
+                                       7:  2, # 怪輪「地獄の苦輪」
+                                       8:  1, # 力業「大江山嵐」
+                                       9:  None, # 四天王奥義「三歩必殺」
+                                       # stage4
+                                       10: 2, # 想起「テリブルスーヴニール」
+                                       11: None, # 想起「二重黒死蝶」             # 霊夢A
+                                       12: None, # 想起「戸隠山投げ」             # 霊夢B
+                                       13: None, # 想起「風神木の葉隠れ」         # 霊夢C
+                                       14: None, # 想起「春の京人形」             # 魔理沙A
+                                       15: None, # 想起「マーキュリポイズン」     # 魔理沙B
+                                       16: None, # 想起「のびーるアーム」         # 魔理沙C
+                                       17: None, # 想起「飛行虫ネスト」           # 霊夢A
+                                       18: None, # 想起「百万鬼夜行」             # 霊夢B
+                                       19: None, # 想起「天狗のマクロバースト」   # 霊夢C
+                                       20: None, # 想起「ストロードールカミカゼ」 # 魔理沙A
+                                       21: None, # 想起「プリンセスウンディネ」   # 魔理沙B
+                                       22: None, # 想起「河童のポロロッカ」       # 魔理沙C
+                                       23: None, # 想起「波と粒の境界」           # 霊夢A
+                                       24: None, # 想起「濛々迷霧」               # 霊夢B
+                                       25: None, # 想起「鳥居つむじ風」           # 霊夢C
+                                       26: None, # 想起「リターンイナニメトネス」 # 魔理沙A
+                                       27: None, # 想起「賢者の石」               # 魔理沙B
+                                       28: None, # 想起「光り輝く水底のトラウマ」 # 魔理沙C
+                                       # stage5
+                                       29: None, # 猫符「キャッツウォーク」
+                                       30: 3, # 呪精「ゾンビフェアリー」
+                                       31: 2, # 恨霊「スプリーンイーター」
+                                       32: 1, # 贖罪「旧地獄の針山」
+                                       33: None, # 「死灰復燃」
+                                       # stage6
+                                       34: None, # 妖怪「火焔の車輪」
+                                       35: 4, # 核熱「ニュークリアフュージョン」
+                                       36: 3, # 爆符「プチフレア」
+                                       37: 2, # 焔星「フィクストスター」
+                                       38: 1, # 「地獄極楽メルトダウン」
+                                       39: None, # 「地獄の人工太陽」
+                                       },
+                           DIFFICULTY_NORMAL:  {
+                                       # stage1
+                                       0:  1, # 罠符「キャプチャーウェブ」
+                                       1:  None, # 瘴符「フィルドミアズマ」
+                                       # stage2
+                                       2:  None, # 妬符「グリーンアイドモンスター」
+                                       3:  1, # 花咲爺「華やかなる仁者への嫉妬」
+                                       4:  None, # 舌切雀「謙虚なる富者への片恨」
+                                       5:  None, # 恨符「丑の刻参り」
+                                       # stage3
+                                       6:  None, # 鬼符「怪力乱神」
+                                       7:  2, # 怪輪「地獄の苦輪」
+                                       8:  1, # 力業「大江山嵐」
+                                       9:  None, # 四天王奥義「三歩必殺」
+                                       # stage4
+                                       10: 2, # 想起「テリブルスーヴニール」
+                                       11: None, # 想起「二重黒死蝶」             # 霊夢A
+                                       12: None, # 想起「戸隠山投げ」             # 霊夢B
+                                       13: None, # 想起「風神木の葉隠れ」         # 霊夢C
+                                       14: None, # 想起「春の京人形」             # 魔理沙A
+                                       15: None, # 想起「マーキュリポイズン」     # 魔理沙B
+                                       16: None, # 想起「のびーるアーム」         # 魔理沙C
+                                       17: None, # 想起「飛行虫ネスト」           # 霊夢A
+                                       18: None, # 想起「百万鬼夜行」             # 霊夢B
+                                       19: None, # 想起「天狗のマクロバースト」   # 霊夢C
+                                       20: None, # 想起「ストロードールカミカゼ」 # 魔理沙A
+                                       21: None, # 想起「プリンセスウンディネ」   # 魔理沙B
+                                       22: None, # 想起「河童のポロロッカ」       # 魔理沙C
+                                       23: None, # 想起「波と粒の境界」           # 霊夢A
+                                       24: None, # 想起「濛々迷霧」               # 霊夢B
+                                       25: None, # 想起「鳥居つむじ風」           # 霊夢C
+                                       26: None, # 想起「リターンイナニメトネス」 # 魔理沙A
+                                       27: None, # 想起「賢者の石」               # 魔理沙B
+                                       28: None, # 想起「光り輝く水底のトラウマ」 # 魔理沙C
+                                       # stage5
+                                       29: None, # 猫符「キャッツウォーク」
+                                       30: 3, # 呪精「ゾンビフェアリー」
+                                       31: 2, # 恨霊「スプリーンイーター」
+                                       32: 1, # 贖罪「旧地獄の針山」
+                                       33: None, # 「死灰復燃」
+                                       # stage6
+                                       34: None, # 妖怪「火焔の車輪」
+                                       35: 4, # 核熱「ニュークリアフュージョン」
+                                       36: 3, # 爆符「メガフレア」
+                                       37: 2, # 焔星「フィクストスター」
+                                       38: 1, # 「地獄極楽メルトダウン」
+                                       39: None, # 「地獄の人工太陽」
+                                       },
+                           DIFFICULTY_HARD:    {
+                                       # stage1
+                                       0:  None, # 怪奇「釣瓶落としの怪」 # H/L限定
+                                       1:  1, # 蜘蛛「石窟の蜘蛛の巣」
+                                       2:  None, # 瘴気「原因不明の熱病」
+                                       # stage2
+                                       3:  None, # 嫉妬「緑色の目をした見えない怪物」
+                                       4:  1, # 花咲爺「シロの灰」
+                                       5:  None, # 舌切雀「大きな葛籠と小さな葛籠」
+                                       6:  None, # 恨符「丑の刻参り七日目」
+                                       # stage3
+                                       7:  None, # 鬼符「怪力乱神」
+                                       8:  2, # 枷符「咎人の外さぬ枷」
+                                       9:  1, # 力業「大江山颪」
+                                       10: None, # 四天王奥義「三歩必殺」
+                                       # stage4
+                                       11: 2, # 想起「恐怖催眠術」
+                                       12: None, # 想起「二重黒死蝶」             # 霊夢A
+                                       13: None, # 想起「戸隠山投げ」             # 霊夢B
+                                       14: None, # 想起「風神木の葉隠れ」         # 霊夢C
+                                       15: None, # 想起「春の京人形」             # 魔理沙A
+                                       16: None, # 想起「マーキュリポイズン」     # 魔理沙B
+                                       17: None, # 想起「のびーるアーム」         # 魔理沙C
+                                       18: None, # 想起「飛行虫ネスト」           # 霊夢A
+                                       19: None, # 想起「百万鬼夜行」             # 霊夢B
+                                       20: None, # 想起「天狗のマクロバースト」   # 霊夢C
+                                       21: None, # 想起「ストロードールカミカゼ」 # 魔理沙A
+                                       22: None, # 想起「プリンセスウンディネ」   # 魔理沙B
+                                       23: None, # 想起「河童のポロロッカ」       # 魔理沙C
+                                       24: None, # 想起「波と粒の境界」           # 霊夢A
+                                       25: None, # 想起「濛々迷霧」               # 霊夢B
+                                       26: None, # 想起「鳥居つむじ風」           # 霊夢C
+                                       27: None, # 想起「リターンイナニメトネス」 # 魔理沙A
+                                       28: None, # 想起「賢者の石」               # 魔理沙B
+                                       29: None, # 想起「光り輝く水底のトラウマ」 # 魔理沙C
+                                       # stage5
+                                       30: None, # 猫符「怨霊猫乱歩」
+                                       31: 3, # 呪精「怨霊憑依妖精」
+                                       32: 2, # 屍霊「食人怨霊」
+                                       33: 1, # 贖罪「昔時の針と痛がる怨霊」
+                                       34: None, # 「小悪霊復活せし」
+                                       # stage6
+                                       35: None, # 妖怪「火焔の車輪」
+                                       36: 4, # 核熱「ニュークリアエクスカーション」
+                                       37: 3, # 爆符「ギガフレア」
+                                       38: 2, # 焔星「プラネタリーレボリューション」
+                                       39: 1, # 「ヘルズトカマク」
+                                       40: None, # 「サブタレイニアンサン」
+                                       },
+                           DIFFICULTY_LUNATIC: {
+                                       # stage1
+                                       0:  None, # 怪奇「釣瓶落としの怪」 # H/L限定
+                                       1:  1, # 蜘蛛「石窟の蜘蛛の巣」
+                                       2:  None, # 瘴気「原因不明の熱病」
+                                       # stage2
+                                       3:  None, # 嫉妬「緑色の目をした見えない怪物」
+                                       4:  1, # 花咲爺「シロの灰」
+                                       5:  None, # 舌切雀「大きな葛籠と小さな葛籠」
+                                       6:  None, # 恨符「丑の刻参り七日目」
+                                       # stage3
+                                       7:  None, # 鬼符「怪力乱神」
+                                       8:  2, # 枷符「咎人の外さぬ枷」
+                                       9:  1, # 力業「大江山颪」
+                                       10: None, # 四天王奥義「三歩必殺」
+                                       # stage4
+                                       11: 2, # 想起「恐怖催眠術」
+                                       12: None, # 想起「二重黒死蝶」             # 霊夢A
+                                       13: None, # 想起「戸隠山投げ」             # 霊夢B
+                                       14: None, # 想起「風神木の葉隠れ」         # 霊夢C
+                                       15: None, # 想起「春の京人形」             # 魔理沙A
+                                       16: None, # 想起「マーキュリポイズン」     # 魔理沙B
+                                       17: None, # 想起「のびーるアーム」         # 魔理沙C
+                                       18: None, # 想起「飛行虫ネスト」           # 霊夢A
+                                       19: None, # 想起「百万鬼夜行」             # 霊夢B
+                                       20: None, # 想起「天狗のマクロバースト」   # 霊夢C
+                                       21: None, # 想起「ストロードールカミカゼ」 # 魔理沙A
+                                       22: None, # 想起「プリンセスウンディネ」   # 魔理沙B
+                                       23: None, # 想起「河童のポロロッカ」       # 魔理沙C
+                                       24: None, # 想起「波と粒の境界」           # 霊夢A
+                                       25: None, # 想起「濛々迷霧」               # 霊夢B
+                                       26: None, # 想起「鳥居つむじ風」           # 霊夢C
+                                       27: None, # 想起「リターンイナニメトネス」 # 魔理沙A
+                                       28: None, # 想起「賢者の石」               # 魔理沙B
+                                       29: None, # 想起「光り輝く水底のトラウマ」 # 魔理沙C
+                                       # stage5
+                                       30: None, # 猫符「怨霊猫乱歩」
+                                       31: 3, # 呪精「怨霊憑依妖精」
+                                       32: 2, # 屍霊「食人怨霊」
+                                       33: 1, # 贖罪「昔時の針と痛がる怨霊」
+                                       34: None, # 「小悪霊復活せし」
+                                       # stage6
+                                       35: None, # 妖怪「火焔の車輪」
+                                       36: 4, # 核熱「核反応制御不能」
+                                       37: 3, # 爆符「ペタフレア」
+                                       38: 2, # 焔星「十凶星」
+                                       39: 1, # 「ヘルズトカマク」
+                                       40: None, # 「サブタレイニアンサン」
+                                       },
+                           DIFFICULTY_EXTRA:   {
+                                       0:  2, # 秘法「九字刺し」
+                                       1:  1, # 奇跡「ミラクルフルーツ」
+                                       2:  None, # 神徳「五穀豊穣ライスシャワー」
+                                       3:  9, # 表象「夢枕にご先祖総立ち」
+                                       4:  8, # 表象「弾幕パラノイア」
+                                       5:  7, # 本能「イドの解放」
+                                       6:  6, # 抑制「スーパーエゴ」
+                                       7:  5, # 反応「妖怪ポリグラフ」
+                                       8:  4, # 無意識「弾幕のロールシャッハ」
+                                       9:  3, # 復燃「恋の埋火」
+                                       10: 2, # 深層「無意識の遺伝子」
+                                       11: 1, # 「嫌われ者のフィロソフィ」
+                                       12: None, # 「サブタレイニアンローズ」
                                        }
 }
 LAST_SPELL_CARD_DICTIONARY = {
@@ -685,6 +900,7 @@ def analyze_difficulty(work_frame):
 
 def analyze_boss_name(original_frame):
     # ボス名をテンプレートマッチングにより取得
+    # 自機が画面左上のボス名に重なると、ボス名が透明になってしまう模様
     boss_name = None
 
     # ボス名は単色（R:119、G:255、B:255）なので色を指定して二値化することで完全一致に近いマッチングが可能
@@ -697,12 +913,12 @@ def analyze_boss_name(original_frame):
     for num, template_img in enumerate(BINARY_BOSS_NAMES):
         res = cv2.matchTemplate(boss_name_frame, template_img, cv2.TM_CCORR_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        print(min_val, max_val, min_loc, max_loc)
+#         print(min_val, max_val, min_loc, max_loc)
         if (max_val > 0.99):
             boss_name = num
             break
 
-    print(boss_name)
+#     print(boss_name)
     return boss_name
 
 
@@ -784,13 +1000,22 @@ def analyze_spell_card(original_frame, boss_name):
 #     cv2.imwrite(OUTPUT_DIR + 'grayscale_spell_card.png', clopped_frame)
 
     for num, template_img in enumerate(BINARY_SPELL_CARDS):
+        # 既に処理済みとなったスペルカードはcontinue
+        if (template_img is None):
+            continue
         res = cv2.matchTemplate(clopped_frame, template_img, cv2.TM_CCORR_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 #         print(min_val, max_val, min_loc, max_loc)
 
-        # 閾値は暫定（6面の判定が厳しい）
+        # 閾値は暫定（Hard6面の判定が厳しい）
         if (max_val > 0.85):
             spell_card = num
+            # 見つかったスペルカードより前のスペルカード情報をNoneで上書きする
+            # 例）スペカ番号37の「ギガフレア」が見つかったタイミングでスペカ番号36の「ニュークリアエクスカーション」のマッチングが不要となるため削除する
+            #      Hard6面が特に誤検出が多いので処理済みのテンプレートをマッチング対象から減らすことで改善が期待できるような気がする
+            for index in range(num):
+                if (BINARY_SPELL_CARDS[index] is not None):
+                    BINARY_SPELL_CARDS[index] = None
             break
 
     return spell_card
@@ -844,7 +1069,7 @@ def convert_spell_card(spell_card):
 def convert_stage_clear(is_stage_clear):
     # ステージクリアの文字列を返す
     if (is_stage_clear):
-        return 'STAGE CLEAR'
+        return STAGE_CLEAR_TXT
     return ''
 
 
@@ -898,3 +1123,26 @@ def output_console(current_time, difficulty, score, remain, graze, boss_name, bo
                                                                                                                                                  )
                      )
     return
+
+
+def inconsistency_check(output, difficulty, boss_name, boss_remain, spell_card):
+    # マッチングにより取得したデータの矛盾チェック
+    # おかしなことになってるデータを検出できたときFalseを返す
+    # 例えば、自機が画面左上にいった時にボス名欄が透明になるため、ボス名が空なのにスペルカード名が存在するという状況が発生しうる
+    if (boss_name is None and spell_card is not None):
+        if (output):
+            print("ボス名が空に対して、スペルカードが存在するためスキップします")
+        return False
+
+    if (difficulty is not None):
+        dictionary = SPELL_CARD_AND_REMAIN_DICTIONARY[difficulty]
+        if (spell_card in dictionary.keys()):
+            dictionary_remain = dictionary[spell_card]
+            print(dictionary_remain)
+            print(boss_remain)
+            if (boss_remain != dictionary_remain):
+                if (output):
+                    print("ボス残機とスペルカードの状況が矛盾してるようです。スキップします")
+                return False
+
+    return True
