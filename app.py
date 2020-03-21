@@ -7,6 +7,7 @@ import time
 import cv2
 import win32gui
 import ctypes
+import pywintypes
 from PIL import ImageGrab
 import sys
 from datetime import datetime
@@ -89,6 +90,10 @@ def main(development):
             print("ボス　　 ： " + convert_boss_name(boss_name))
             print("ボス残機 ： " + convert_boss_remain(boss_remain))
             print("スペル　 ： " + convert_spell_card(spell_card))
+
+    except pywintypes.error:
+        print(colored("\n\n東方地霊殿が終了したのでプログラムも終了します", "green"))
+        exit(0)
 
     except KeyboardInterrupt:
         print(colored("プログラムを終了します", "green"))

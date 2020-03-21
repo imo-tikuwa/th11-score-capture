@@ -488,7 +488,7 @@ def analyze_score(work_frame):
     score_results = []
     for index, roi in enumerate(SCORE_ROIS):
         clopped_frame = work_frame[roi[1]:roi[3], roi[0]:roi[2]]
-        cv2.imwrite(OUTPUT_DIR + 'per_score' + str(index) + '.png', clopped_frame)
+#         cv2.imwrite(OUTPUT_DIR + 'per_score' + str(index) + '.png', clopped_frame)
 
         for num, template_img in enumerate(BINARY_NUMBERS):
             res = cv2.matchTemplate(clopped_frame, template_img, cv2.TM_CCORR_NORMED)
