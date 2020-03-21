@@ -15,8 +15,6 @@ from datetime import datetime
 from termcolor import colored
 # 関数、定数をインポート
 from commons import *
-# CSV出力
-# import csv
 
 @click.command()
 @click.option('--development','-dev',is_flag=True) # 開発モードのとき解析に使用した画像を保管する
@@ -31,6 +29,7 @@ def main(development):
     # とりあえず5秒毎に画面をキャプチャ
     # スコア、残機の辺りを抽出する
     # スコアの表示は確認したところ等間隔なので1文字ずつ抽出した方が簡単そう
+    results = []
     try:
         current_difficulty = None
         while(True):
@@ -82,28 +81,67 @@ def main(development):
             # スペルカードについてテンプレートマッチング
             spell_card = analyze_spell_card(original_frame)
 
+            # コンソール出力
+            score = str(score)
+            remain = str(remain)
+            difficulty = convert_difficulty(difficulty)
+            boss_name = convert_boss_name(boss_name)
+            boss_remain = convert_boss_remain(boss_remain, boss_name)
+            spell_card = convert_spell_card(spell_card)
             print('----- ' + current_time + '.png -----')
-            print("スコア　 ： " + str(score))
-            print("残機　　 ： " + str(remain))
+            print("スコア　 ： " + score)
+            print("残機　　 ： " + remain)
             print("グレイズ ： " + graze)
-            print("難易度　 ： " + convert_difficulty(difficulty))
-            print("ボス　　 ： " + convert_boss_name(boss_name))
-            print("ボス残機 ： " + convert_boss_remain(boss_remain))
-            print("スペル　 ： " + convert_spell_card(spell_card))
+            print("難易度　 ： " + difficulty)
+            print("ボス　　 ： " + boss_name)
+            print("ボス残機 ： " + boss_remain)
+            print("スペル　 ： " + spell_card)
+
+            # 結果を格納
+            results.append([score, remain, graze, difficulty, boss_name, boss_remain, spell_card])
 
     except pywintypes.error:
         print(colored("\n\n東方地霊殿が終了したのでプログラムも終了します", "green"))
-        exit(0)
 
     except KeyboardInterrupt:
         print(colored("プログラムを終了します", "green"))
-        exit(0)
 
     # CSV出力
-#     csv_data = [[1234, 1, 100, 'Lunatic', '', ''],[12345, 1.2, 200, 'Lunatic', '', '']]
-#     with open(OUTPUT_DIR + datetime.now().strftime('%Y%m%d%H%M%S') + '.csv', 'w') as file:
-#         writer = csv.writer(file)
-#         writer.writerows(csv_data)
+    if (len(results) > 0):
+
+        # 重複を含めたすべてのデータをCSV出力
+        save_datetime = datetime.now().strftime('%Y%m%d%H%M%S')
+        save_csv(save_datetime + '_all_result.csv', results)
+
+        # ため込んだデータをforループして末尾のデータから順番に検証、以下の処理を実施
+        # 1. スペルカードが重複するデータを削除する(古いものが残るようにする)
+        # 2. currentのボス名が空、prevとnextのボス名が存在するときcurrentを会話中orデータ取得に失敗とみなし削除
+        results_length = len(results)
+        for current_index in reversed(range(results_length)):
+            # current_numのレコードを中心に前、現在、後の3レコードを取得
+            current = results[current_index]
+            prev = next = None
+            if (current_index > 0):
+                prev = results[current_index - 1]
+            if (current_index < len(results) - 1):
+                next = results[current_index + 1]
+
+            # スペルカード名の列が一致していたら新しい方(current)を削除
+            if (prev is not None and current[6] == prev[6]):
+                del results[current_index]
+                continue
+
+            # currentのボス名が空、prevとnextのボス名が存在するとき = 会話中とみなしてcurrentを削除
+            if (prev is not None and next is not None):
+                if (current[4] == '' and prev[4] != '' and next[4] != '' and prev[4] == next[4]):
+                    del results[current_index]
+                    continue
+
+        # 重複を削除したデータをCSV出力
+        save_csv(save_datetime + '_result.csv', results)
+        print(colored("結果をCSVに出力しました。", "green"))
+
+
 
 if __name__ == '__main__':
     main()

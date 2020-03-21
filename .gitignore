@@ -3,4 +3,5 @@
 /settings.ini
 /__pycache__
 /output/*.png
+/output/*.csv
 /memo.txt

@@ -15,6 +15,9 @@ colorama.init()
 import configparser
 # スペルカードディレクトリ内の特定のファイル数をカウントするのに利用
 import glob
+# CSV出力
+import csv
+import copy
 
 
 # 変数(定数扱いする変数)
@@ -678,9 +681,12 @@ def convert_boss_name(boss_name):
     return BOSS_NAME_HASHMAP[boss_name]
 
 
-def convert_boss_remain(boss_remain):
+def convert_boss_remain(boss_remain, boss_name):
     # ボス残機を文字列に変換
     if (boss_remain is None):
+        # ボス名が存在する場合は0を返す
+        if (boss_name != ''):
+            return '0'
         return ''
     return str(boss_remain)
 
@@ -690,3 +696,18 @@ def convert_spell_card(spell_card):
     if (spell_card is not None and spell_card < len(SPELL_CARD_NAMES)):
         return SPELL_CARD_NAMES[spell_card]
     return ''
+
+
+def save_csv(csv_name, results):
+    # CSV書き込み処理
+    csv_data = copy.copy(results)
+
+    # ヘッダ追加
+    csv_data.insert(0, ['スコア', '残機', 'グレイズ', '難易度', 'ボス', 'ボス残機', 'スペル'])
+
+    # CSV保存
+    with open(OUTPUT_DIR + csv_name, "w", newline="") as file:
+        writer = csv.writer(file, delimiter=",")
+        writer.writerows(csv_data)
+
+    return True
