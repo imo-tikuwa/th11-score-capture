@@ -30,9 +30,9 @@ def main():
         current_time = datetime.now().strftime('%Y%m%d%H%M%S%f')
         original_frame = get_original_frame(capture_area, current_time, True)
 
-        # スペルカードの画像を保存
-        clopped_frame = original_frame[SPELL_CARD_ROI[1]:SPELL_CARD_ROI[3], SPELL_CARD_ROI[0]:SPELL_CARD_ROI[2]]
-        file_name = OUTPUT_DIR + current_time + '_spell.png'
+        # ステージクリアの画像を保存
+        clopped_frame = original_frame[STAGE_CLEAR_ROI[1]:STAGE_CLEAR_ROI[3], STAGE_CLEAR_ROI[0]:STAGE_CLEAR_ROI[2]]
+        file_name = OUTPUT_DIR + current_time + '_stage_clear.png'
         Image.fromarray(clopped_frame).save(file_name)
 
         # 3回キャプチャしたら処理を抜ける
@@ -41,7 +41,7 @@ def main():
             break
         time.sleep(0.5)
 
-    print("スペルカードのサンプルデータを取得しました。\n左右の余分なピクセルは必要に応じて切り取ってください")
+    print("ステージクリアのサンプルデータを取得しました。\n左右の余分なピクセルは必要に応じて切り取ってください")
 
 
 if __name__ == '__main__':

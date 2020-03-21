@@ -1,10 +1,10 @@
-
+import numpy
 import os
 import time
 import cv2
 import subprocess
 from datetime import datetime
-from PIL import Image
+from PIL import Image, ImageGrab
 import win32gui
 import tkinter, tkinter.filedialog, tkinter.messagebox
 # print出力に色付ける
@@ -399,6 +399,8 @@ BINARY_SPELL_CARDS = []
 # スペルカード名情報(BINARY_SPELL_CARDSと同じタイミングで定義)
 SPELL_CARD_NAMES = {}
 
+# ステージクリアのROI
+STAGE_CLEAR_ROI = (227, 212, 673, 272)
 
 def config_init():
     # コンフィグを初期化
@@ -473,7 +475,16 @@ def ajust_capture_position(rect_left, rect_top, rect_right, rect_bottom):
     cap_right = cap_left + 1280
     cap_bottom = cap_top + 960
 
-    return cap_left, cap_top, cap_right, cap_bottom
+    return (cap_left, cap_top, cap_right, cap_bottom)
+
+
+def get_original_frame(capture_area, current_time, development):
+    # 画面のクリッピング処理
+    img = ImageGrab.grab(bbox=capture_area)
+    if development:
+        img.save(OUTPUT_DIR + current_time + '.png')
+
+    return numpy.array(img)
 
 
 def edit_frame(frame):

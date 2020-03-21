@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
-import numpy as np
 import os
-import re
 import click
 import time
 import cv2
 import win32gui
-import ctypes
-from PIL import ImageGrab
-import sys
 from datetime import datetime
 # print出力に色付ける
 from termcolor import colored
@@ -33,13 +28,11 @@ def main():
             rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
 
             # ウィンドウの外枠＋数ピクセル余分にとれちゃうので1280x960の位置補正
-            cap_left, cap_top, cap_right, cap_bottom = ajust_capture_position(rect_left, rect_top, rect_right, rect_bottom)
+            capture_area = ajust_capture_position(rect_left, rect_top, rect_right, rect_bottom)
 
             # 指定した領域内をクリッピング
             current_time = datetime.now().strftime('%Y%m%d%H%M%S')
-            img = ImageGrab.grab(bbox=(cap_left,cap_top,cap_right,cap_bottom))
-            img.save(OUTPUT_DIR + current_time + '.png')
-            original_frame = np.array(img)
+            original_frame = get_original_frame(capture_area, current_time, True)
 
             # スコアの画像を保存（グレイズにも使用）
             for index, roi in enumerate(SCORE_ROIS):

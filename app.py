@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
-import numpy as np
 import os
-import re
 import click
 import time
-import cv2
 import win32gui
-import ctypes
 import pywintypes
-from PIL import ImageGrab
-import sys
 from datetime import datetime
 # print出力に色付ける
 from termcolor import colored
@@ -26,27 +20,24 @@ def main(development):
     # 地霊殿のハンドルを起動、起動してなかったら起動
     th11_handle = execute_th11(config)
 
-    # とりあえず5秒毎に画面をキャプチャ
     # スコア、残機の辺りを抽出する
     # スコアの表示は確認したところ等間隔なので1文字ずつ抽出した方が簡単そう
     results = []
     try:
         current_difficulty = None
-        speep_second = 5
+        speep_second = 3
         while(True):
-            time.sleep(speep_second)
+            if (speep_second > 0):
+                time.sleep(speep_second)
 
             rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
 
             # ウィンドウの外枠＋数ピクセル余分にとれちゃうので1280x960の位置補正
-            cap_left, cap_top, cap_right, cap_bottom = ajust_capture_position(rect_left, rect_top, rect_right, rect_bottom)
+            capture_area = ajust_capture_position(rect_left, rect_top, rect_right, rect_bottom)
 
             # 指定した領域内をクリッピング
             current_time = datetime.now().strftime('%Y%m%d%H%M%S%f')
-            img = ImageGrab.grab(bbox=(cap_left, cap_top, cap_right, cap_bottom))
-            if development:
-                img.save(OUTPUT_DIR + current_time + '.png')
-            original_frame = np.array(img)
+            original_frame = get_original_frame(capture_area, current_time, development)
 
             # 二値化
             work_frame = edit_frame(original_frame)
