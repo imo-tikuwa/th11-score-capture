@@ -385,6 +385,15 @@ LAST_SPELL_CARD_DICTIONARY = {
                                        12: '「サブタレイニアンローズ」',
                                        }
 }
+# CSVファイルの列のインデックス番号
+CSV_INDEX_DIFFICULTY        = 0
+CSV_INDEX_SCORE             = 1
+CSV_INDEX_REMAIN            = 2
+CSV_INDEX_GRAZE             = 3
+CSV_INDEX_BOSS_NAME         = 4
+CSV_INDEX_BOSS_REMAIN       = 5
+CSV_INDEX_SPELL_CARD        = 6
+CSV_INDEX_CURRENT_POSITION  = 7
 
 # スコアのROI配列(10億、1億、1000万...の順)
 SCORE_ROIS = []
@@ -688,11 +697,12 @@ def analyze_boss_name(original_frame):
     for num, template_img in enumerate(BINARY_BOSS_NAMES):
         res = cv2.matchTemplate(boss_name_frame, template_img, cv2.TM_CCORR_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-#         print(min_val, max_val, min_loc, max_loc)
+        print(min_val, max_val, min_loc, max_loc)
         if (max_val > 0.99):
             boss_name = num
             break
 
+    print(boss_name)
     return boss_name
 
 
@@ -776,10 +786,10 @@ def analyze_spell_card(original_frame, boss_name):
     for num, template_img in enumerate(BINARY_SPELL_CARDS):
         res = cv2.matchTemplate(clopped_frame, template_img, cv2.TM_CCORR_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        print(min_val, max_val, min_loc, max_loc)
+#         print(min_val, max_val, min_loc, max_loc)
 
         # 閾値は暫定（6面の判定が厳しい）
-        if (max_val > 0.87):
+        if (max_val > 0.85):
             spell_card = num
             break
 
@@ -818,7 +828,7 @@ def convert_boss_remain(boss_remain, boss_name):
     # ボス残機を文字列に変換
     if (boss_remain is None):
         # ボス名が存在する場合は0を返す
-        if (boss_name != ''):
+        if (boss_name is not None and boss_name != ''):
             return '0'
         return ''
     return str(boss_remain)
@@ -848,7 +858,14 @@ def check_is_last_spell(spell_card):
 
 def save_csv(csv_name, results):
     # CSV書き込み処理
-    csv_data = copy.copy(results)
+    csv_data = copy.deepcopy(results)
+
+    # ボスやスペルなどのコード値を文字列に変換
+    for index, row in enumerate(csv_data):
+        csv_data[index][CSV_INDEX_DIFFICULTY] = convert_difficulty(row[CSV_INDEX_DIFFICULTY])
+        csv_data[index][CSV_INDEX_BOSS_NAME] = convert_boss_name(row[CSV_INDEX_BOSS_NAME])
+        csv_data[index][CSV_INDEX_BOSS_REMAIN] = convert_boss_remain(row[CSV_INDEX_BOSS_REMAIN], row[CSV_INDEX_BOSS_NAME])
+        csv_data[index][CSV_INDEX_SPELL_CARD] = convert_spell_card(row[CSV_INDEX_SPELL_CARD])
 
     # ヘッダ追加
     csv_data.insert(0, ['難易度', 'スコア', '残機', 'グレイズ', 'ボス', 'ボス残機', 'スペル', '現在地'])
@@ -863,4 +880,21 @@ def save_csv(csv_name, results):
 
 def fill_current_position(results):
     # ボス名、ボス残機、スペルカードなどの情報から各レコードの現在地を埋める
+    return
+
+
+def output_console(current_time, difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position):
+    # コンソールにテンプレートマッチングの結果を出力する
+    print("----- {0}.png -----\n難易度　 ： {1}\nスコア　 ： {2}\n残機　　 ： {3}\nグレイズ ： {4}\nボス　　 ： {5}\nボス残機 ： {6}\nスペル　 ： {7}\n現在地　 ： {8}".format(
+                                                                                                                                                 current_time,
+                                                                                                                                                 convert_difficulty(difficulty),
+                                                                                                                                                 str(score),
+                                                                                                                                                 str(remain),
+                                                                                                                                                 graze,
+                                                                                                                                                 convert_boss_name(boss_name),
+                                                                                                                                                 convert_boss_remain(boss_remain, boss_name),
+                                                                                                                                                 convert_spell_card(spell_card),
+                                                                                                                                                 current_position
+                                                                                                                                                 )
+                     )
     return

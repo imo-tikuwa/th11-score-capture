@@ -12,7 +12,8 @@ from commons import *
 
 @click.command()
 @click.option('--development','-dev',is_flag=True) # 開発モードのとき解析に使用した画像を保管する
-def main(development):
+@click.option('--output','-out',is_flag=True)      # コンソールにログを出力する
+def main(development, output):
 
     # コンフィグ初期化
     config = config_init()
@@ -82,23 +83,13 @@ def main(development):
             if (is_stage_clear):
                 sleep_second = 3
 
-            # コンソール出力
-            difficulty = convert_difficulty(difficulty)
-            score = str(score)
-            remain = str(remain)
-            boss_name = convert_boss_name(boss_name)
-            boss_remain = convert_boss_remain(boss_remain, boss_name)
-            spell_card = convert_spell_card(spell_card)
+            # ステージクリア判定
             current_position = convert_stage_clear(is_stage_clear)
-            print('----- ' + current_time + '.png -----')
-            print("難易度　 ： " + difficulty)
-            print("スコア　 ： " + score)
-            print("残機　　 ： " + remain)
-            print("グレイズ ： " + graze)
-            print("ボス　　 ： " + boss_name)
-            print("ボス残機 ： " + boss_remain)
-            print("スペル　 ： " + spell_card)
-            print("現在地　 ： " + current_position)
+
+            # コンソール出力
+            if (output):
+                output_console(current_time, difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position)
+
             # 結果を格納
             results.append([difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position])
 
@@ -129,13 +120,13 @@ def main(development):
                 next = results[current_index + 1]
 
             # prevのレコードとcurrentのレコードのボス名、ボス残機、スペルカードが一致していたらcurrentは重複と見なして削除
-            if (prev is not None and current[4] == prev[4] and current[5] == prev[5] and current[6] == prev[6]):
+            if (prev is not None and current[CSV_INDEX_BOSS_NAME] == prev[CSV_INDEX_BOSS_NAME] and current[CSV_INDEX_BOSS_REMAIN] == prev[CSV_INDEX_BOSS_REMAIN] and current[CSV_INDEX_SPELL_CARD] == prev[CSV_INDEX_SPELL_CARD]):
                 del results[current_index]
                 continue
 
             # currentのボス名が空、prevとnextのボス名が存在するとき会話中orデータ取得に失敗とみなしてcurrentを削除
             if (prev is not None and next is not None):
-                if (current[4] == '' and prev[4] != '' and next[4] != '' and prev[4] == next[4]):
+                if (current[CSV_INDEX_BOSS_NAME] == '' and prev[CSV_INDEX_BOSS_NAME] != '' and next[CSV_INDEX_BOSS_NAME] != '' and prev[CSV_INDEX_BOSS_NAME] == next[CSV_INDEX_BOSS_NAME]):
                     del results[current_index]
                     continue
 
