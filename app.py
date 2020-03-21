@@ -32,8 +32,9 @@ def main(development):
     results = []
     try:
         current_difficulty = None
+        speep_second = 5
         while(True):
-            time.sleep(5)
+            time.sleep(speep_second)
 
             rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
 
@@ -46,7 +47,6 @@ def main(development):
             if development:
                 img.save(OUTPUT_DIR + current_time + '.png')
             original_frame = np.array(img)
-
 
             # 二値化
             work_frame = edit_frame(original_frame)
@@ -82,23 +82,23 @@ def main(development):
             spell_card = analyze_spell_card(original_frame)
 
             # コンソール出力
+            difficulty = convert_difficulty(difficulty)
             score = str(score)
             remain = str(remain)
-            difficulty = convert_difficulty(difficulty)
             boss_name = convert_boss_name(boss_name)
             boss_remain = convert_boss_remain(boss_remain, boss_name)
             spell_card = convert_spell_card(spell_card)
             print('----- ' + current_time + '.png -----')
+            print("難易度　 ： " + difficulty)
             print("スコア　 ： " + score)
             print("残機　　 ： " + remain)
             print("グレイズ ： " + graze)
-            print("難易度　 ： " + difficulty)
             print("ボス　　 ： " + boss_name)
             print("ボス残機 ： " + boss_remain)
             print("スペル　 ： " + spell_card)
 
             # 結果を格納
-            results.append([score, remain, graze, difficulty, boss_name, boss_remain, spell_card])
+            results.append([difficulty, score, remain, graze, boss_name, boss_remain, spell_card])
 
     except pywintypes.error:
         print(colored("\n\n東方地霊殿が終了したのでプログラムも終了します", "green"))
@@ -126,12 +126,12 @@ def main(development):
             if (current_index < len(results) - 1):
                 next = results[current_index + 1]
 
-            # スペルカード名の列が一致していたら新しい方(current)を削除
-            if (prev is not None and current[6] == prev[6]):
+            # prevのレコードとcurrentのレコードのボス名、ボス残機、スペルカードが一致していたらcurrentは重複と見なして削除
+            if (prev is not None and current[4] == prev[4] and current[5] == prev[5] and current[6] == prev[6]):
                 del results[current_index]
                 continue
 
-            # currentのボス名が空、prevとnextのボス名が存在するとき = 会話中とみなしてcurrentを削除
+            # currentのボス名が空、prevとnextのボス名が存在するとき会話中orデータ取得に失敗とみなしてcurrentを削除
             if (prev is not None and next is not None):
                 if (current[4] == '' and prev[4] != '' and next[4] != '' and prev[4] == next[4]):
                     del results[current_index]

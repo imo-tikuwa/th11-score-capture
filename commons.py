@@ -703,7 +703,7 @@ def save_csv(csv_name, results):
     csv_data = copy.copy(results)
 
     # ヘッダ追加
-    csv_data.insert(0, ['スコア', '残機', 'グレイズ', '難易度', 'ボス', 'ボス残機', 'スペル'])
+    csv_data.insert(0, ['難易度', 'スコア', '残機', 'グレイズ', 'ボス', 'ボス残機', 'スペル'])
 
     # CSV保存
     with open(OUTPUT_DIR + csv_name, "w", newline="") as file:
@@ -711,3 +711,8 @@ def save_csv(csv_name, results):
         writer.writerows(csv_data)
 
     return True
+
+
+def fill_current_position(results):
+    # ボス名、ボス残機、スペルカードなどの情報から各レコードの現在値を埋める
+    return
