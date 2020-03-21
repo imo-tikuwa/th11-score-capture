@@ -25,10 +25,10 @@ def main(development):
     results = []
     try:
         current_difficulty = None
-        speep_second = 3
+        sleep_second = 3
         while(True):
-            if (speep_second > 0):
-                time.sleep(speep_second)
+            if (sleep_second > 0):
+                time.sleep(sleep_second)
 
             rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
 
@@ -67,10 +67,20 @@ def main(development):
             boss_name = analyze_boss_name(original_frame)
 
             # ボス残機についてテンプレートマッチング
-            boss_remain = analyze_boss_remain(original_frame)
+            boss_remain = analyze_boss_remain(original_frame, boss_name)
 
             # スペルカードについてテンプレートマッチング
-            spell_card = analyze_spell_card(original_frame)
+            spell_card = analyze_spell_card(original_frame, boss_name)
+
+            # ラストスペルのときステージクリアの瞬間をキャプチャするため一時的に処理間隔を0.5秒に変更
+            is_last_spell = check_is_last_spell(spell_card)
+            if (is_last_spell):
+                sleep_second = 0.5
+
+            # ステージクリアについてテンプレートマッチング
+            is_stage_clear = analyze_stage_clear(work_frame)
+            if (is_stage_clear):
+                sleep_second = 3
 
             # コンソール出力
             difficulty = convert_difficulty(difficulty)
@@ -79,6 +89,7 @@ def main(development):
             boss_name = convert_boss_name(boss_name)
             boss_remain = convert_boss_remain(boss_remain, boss_name)
             spell_card = convert_spell_card(spell_card)
+            current_position = convert_stage_clear(is_stage_clear)
             print('----- ' + current_time + '.png -----')
             print("難易度　 ： " + difficulty)
             print("スコア　 ： " + score)
@@ -87,9 +98,9 @@ def main(development):
             print("ボス　　 ： " + boss_name)
             print("ボス残機 ： " + boss_remain)
             print("スペル　 ： " + spell_card)
-
+            print("現在地　 ： " + current_position)
             # 結果を格納
-            results.append([difficulty, score, remain, graze, boss_name, boss_remain, spell_card])
+            results.append([difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position])
 
     except pywintypes.error:
         print(colored("\n\n東方地霊殿が終了したのでプログラムも終了します", "green"))

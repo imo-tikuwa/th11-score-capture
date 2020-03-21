@@ -32,6 +32,7 @@ SAMPLE_DIFFICULTIES_DIR = SAMPLE_DIR + 'difficulty' + os.sep
 SAMPLE_BOSS_NAMES_DIR = SAMPLE_DIR + 'boss_name' + os.sep
 SAMPLE_BOSS_REMAINS_DIR = SAMPLE_DIR + 'boss_remain' + os.sep
 SAMPLE_SPELL_CARDS_DIR = SAMPLE_DIR + 'spell_card' + os.sep
+SAMPLE_STAGE_CLEARS_DIR = SAMPLE_DIR + 'stage_clear' + os.sep
 DIFFICULTY_EASY = 0
 DIFFICULTY_NORMAL = 1
 DIFFICULTY_HARD = 2
@@ -302,6 +303,88 @@ SPELL_CARD_NAME_DICTIONARY = {
                                        12: '「サブタレイニアンローズ」',
                                        }
 }
+LAST_SPELL_CARD_DICTIONARY = {
+                           None: '',
+                           'easy':    {
+                                       # stage1
+                                       1:  '瘴符「フィルドミアズマ」',
+                                       # stage2
+                                       5:  '恨符「丑の刻参り」',
+                                       # stage3
+                                       9:  '四天王奥義「三歩必殺」',
+                                       # stage4
+                                       23: '想起「波と粒の境界」',           # 霊夢A
+                                       24: '想起「濛々迷霧」',               # 霊夢B
+                                       25: '想起「鳥居つむじ風」',           # 霊夢C
+                                       26: '想起「リターンイナニメトネス」', # 魔理沙A
+                                       27: '想起「賢者の石」',               # 魔理沙B
+                                       28: '想起「光り輝く水底のトラウマ」', # 魔理沙C
+                                       # stage5
+                                       33: '「死灰復燃」',
+                                       # stage6
+                                       39: '「地獄の人工太陽」',
+                                       },
+                           'normal':  {
+                                       # stage1
+                                       1:  '瘴符「フィルドミアズマ」',
+                                       # stage2
+                                       5:  '恨符「丑の刻参り」',
+                                       # stage3
+                                       9:  '四天王奥義「三歩必殺」',
+                                       # stage4
+                                       23: '想起「波と粒の境界」',           # 霊夢A
+                                       24: '想起「濛々迷霧」',               # 霊夢B
+                                       25: '想起「鳥居つむじ風」',           # 霊夢C
+                                       26: '想起「リターンイナニメトネス」', # 魔理沙A
+                                       27: '想起「賢者の石」',               # 魔理沙B
+                                       28: '想起「光り輝く水底のトラウマ」', # 魔理沙C
+                                       # stage5
+                                       33: '「死灰復燃」',
+                                       # stage6
+                                       39: '「地獄の人工太陽」',
+                                       },
+                           'hard':    {
+                                       # stage1
+                                       2:  '瘴気「原因不明の熱病」',
+                                       # stage2
+                                       6:  '恨符「丑の刻参り七日目」',
+                                       # stage3
+                                       10: '四天王奥義「三歩必殺」',
+                                       # stage4
+                                       24: '想起「波と粒の境界」',           # 霊夢A
+                                       25: '想起「濛々迷霧」',               # 霊夢B
+                                       26: '想起「鳥居つむじ風」',           # 霊夢C
+                                       27: '想起「リターンイナニメトネス」', # 魔理沙A
+                                       28: '想起「賢者の石」',               # 魔理沙B
+                                       29: '想起「光り輝く水底のトラウマ」', # 魔理沙C
+                                       # stage5
+                                       34: '「小悪霊復活せし」',
+                                       # stage6
+                                       40: '「サブタレイニアンサン」',
+                                       },
+                           'lunatic': {
+                                       # stage1
+                                       2:  '瘴気「原因不明の熱病」',
+                                       # stage2
+                                       6:  '恨符「丑の刻参り七日目」',
+                                       # stage3
+                                       10: '四天王奥義「三歩必殺」',
+                                       # stage4
+                                       24: '想起「波と粒の境界」',           # 霊夢A
+                                       25: '想起「濛々迷霧」',               # 霊夢B
+                                       26: '想起「鳥居つむじ風」',           # 霊夢C
+                                       27: '想起「リターンイナニメトネス」', # 魔理沙A
+                                       28: '想起「賢者の石」',               # 魔理沙B
+                                       29: '想起「光り輝く水底のトラウマ」', # 魔理沙C
+                                       # stage5
+                                       34: '「小悪霊復活せし」',
+                                       # stage6
+                                       40: '「サブタレイニアンサン」',
+                                       },
+                           'extra':   {
+                                       12: '「サブタレイニアンローズ」',
+                                       }
+}
 
 # スコアのROI配列(10億、1億、1000万...の順)
 SCORE_ROIS = []
@@ -358,6 +441,17 @@ for index in range(9):
     bottom = top + height
     BOSS_REMAIN_ROIS.append((left, top, right, bottom))
 
+# スペルカードのROI
+SPELL_CARD_ROI = (270, 64, 820, 97)
+
+# スペルカード名情報(BINARY_SPELL_CARDSと同じタイミングで定義)
+SPELL_CARD_NAMES = {}
+# ラストスペルカード情報(BINARY_SPELL_CARDSと同じタイミングで定義)
+LAST_SPELL_CARDS = {}
+
+# ステージクリアのROI
+STAGE_CLEAR_ROI = (227, 212, 673, 272)
+
 
 # スコアのサンプルデータ(0～9)
 BINARY_NUMBERS = []
@@ -390,17 +484,15 @@ for index in range(9):
 BINARY_BOSS_REMAIN = cv2.imread(SAMPLE_BOSS_REMAINS_DIR + '0.png')
 BINARY_BOSS_REMAIN = cv2.inRange(BINARY_BOSS_REMAIN, (21, 172, 89), (225, 244, 233))
 
-# スペルカードのROI
-SPELL_CARD_ROI = (270, 64, 820, 97)
-
 # スペルカードのサンプルデータ(難易度を元に動的に切り替え)
 BINARY_SPELL_CARDS = []
 
-# スペルカード名情報(BINARY_SPELL_CARDSと同じタイミングで定義)
-SPELL_CARD_NAMES = {}
+# ステージクリアのサンプルデータ(1～6面およびリプレイ再生時のALLクリア用の2種類)
+BINARY_STAGE_CLEARS = []
+for index in range(6):
+    img = cv2.imread(SAMPLE_STAGE_CLEARS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
+    BINARY_STAGE_CLEARS.append(img)
 
-# ステージクリアのROI
-STAGE_CLEAR_ROI = (227, 212, 673, 272)
 
 def config_init():
     # コンフィグを初期化
@@ -490,12 +582,10 @@ def get_original_frame(capture_area, current_time, development):
 def edit_frame(frame):
     # フレームを二値化
     work_frame = frame
-
     work_frame = cv2.cvtColor(work_frame, cv2.COLOR_RGB2GRAY)
-#     work_frame = cv2.threshold(work_frame, FRAME_THRESH, 255, cv2.THRESH_BINARY)[1]
-#     work_frame = cv2.bitwise_not(work_frame)
 
     return work_frame
+
 
 def analyze_score(work_frame):
     # スコアをテンプレートマッチングにより取得
@@ -606,9 +696,13 @@ def analyze_boss_name(original_frame):
     return boss_name
 
 
-def analyze_boss_remain(original_frame):
+def analyze_boss_remain(original_frame, boss_name):
     # ボス残機をテンプレートマッチングにより取得
     boss_remain = None
+
+    # ボス名が検出できなかったときは固定でNoneを返す
+    if (boss_name is None):
+        return boss_remain
 
     # ボス残機は薄い緑（R:233、G:244、B:225）～濃い緑（R:89、G:172、B:21）なので色を指定して二値化する
     # 二値化の色指定について
@@ -640,8 +734,10 @@ def load_spell_card_binaries(difficulty):
     # スペルカードのサンプルデータ読み込み
     global BINARY_SPELL_CARDS
     global SPELL_CARD_NAMES
+    global LAST_SPELL_CARDS
     BINARY_SPELL_CARDS = []
     SPELL_CARD_NAMES = {}
+    LAST_SPELL_CARDS = {}
 
     # 難易度名取得(easy～extra)
     difficulty_name = ''
@@ -659,12 +755,20 @@ def load_spell_card_binaries(difficulty):
     # スペルカード名のマップ初期化
     SPELL_CARD_NAMES = SPELL_CARD_NAME_DICTIONARY[difficulty_name]
 
+    # ラストスペルカードのマップ初期化
+    LAST_SPELL_CARDS = LAST_SPELL_CARD_DICTIONARY[difficulty_name]
+
     return BINARY_SPELL_CARDS # app内では使わない(予定)だけど返しておく
 
 
-def analyze_spell_card(original_frame):
+def analyze_spell_card(original_frame, boss_name):
     # スペルカードをテンプレートマッチングにより取得
     spell_card = None
+
+    # ボス名が検出できなかったときは固定でNoneを返す
+    if (boss_name is None):
+        return spell_card
+
     clopped_frame = original_frame[SPELL_CARD_ROI[1]:SPELL_CARD_ROI[3], SPELL_CARD_ROI[0]:SPELL_CARD_ROI[2]]
     clopped_frame = cv2.cvtColor(clopped_frame, cv2.COLOR_RGB2GRAY)
 #     cv2.imwrite(OUTPUT_DIR + 'grayscale_spell_card.png', clopped_frame)
@@ -672,14 +776,32 @@ def analyze_spell_card(original_frame):
     for num, template_img in enumerate(BINARY_SPELL_CARDS):
         res = cv2.matchTemplate(clopped_frame, template_img, cv2.TM_CCORR_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-#         print(min_val, max_val, min_loc, max_loc)
+        print(min_val, max_val, min_loc, max_loc)
 
-        # 閾値は暫定
-        if (max_val > 0.85):
+        # 閾値は暫定（6面の判定が厳しい）
+        if (max_val > 0.87):
             spell_card = num
             break
 
     return spell_card
+
+
+def analyze_stage_clear(work_frame):
+    # ステージクリアをテンプレートマッチングにより取得
+    is_stage_clear = False
+
+    clopped_frame = work_frame[STAGE_CLEAR_ROI[1]:STAGE_CLEAR_ROI[3], STAGE_CLEAR_ROI[0]:STAGE_CLEAR_ROI[2]]
+#     cv2.imwrite(OUTPUT_DIR + 'is_stage_clear.png', clopped_frame)
+
+    for num, template_img in enumerate(BINARY_STAGE_CLEARS):
+        res = cv2.matchTemplate(clopped_frame, template_img, cv2.TM_CCORR_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+#         print(min_val, max_val, min_loc, max_loc)
+        if (max_val > 0.96):
+            is_stage_clear = True
+            break
+
+    return is_stage_clear
 
 
 def convert_difficulty(difficulty):
@@ -709,12 +831,27 @@ def convert_spell_card(spell_card):
     return ''
 
 
+def convert_stage_clear(is_stage_clear):
+    # ステージクリアの文字列を返す
+    if (is_stage_clear):
+        return 'STAGE CLEAR'
+    return ''
+
+
+def check_is_last_spell(spell_card):
+    # ラストスペルカードかどうか判定
+    if (spell_card is None):
+        return False
+
+    return spell_card in LAST_SPELL_CARDS.keys()
+
+
 def save_csv(csv_name, results):
     # CSV書き込み処理
     csv_data = copy.copy(results)
 
     # ヘッダ追加
-    csv_data.insert(0, ['難易度', 'スコア', '残機', 'グレイズ', 'ボス', 'ボス残機', 'スペル'])
+    csv_data.insert(0, ['難易度', 'スコア', '残機', 'グレイズ', 'ボス', 'ボス残機', 'スペル', '現在地'])
 
     # CSV保存
     with open(OUTPUT_DIR + csv_name, "w", newline="") as file:
@@ -725,5 +862,5 @@ def save_csv(csv_name, results):
 
 
 def fill_current_position(results):
-    # ボス名、ボス残機、スペルカードなどの情報から各レコードの現在値を埋める
+    # ボス名、ボス残機、スペルカードなどの情報から各レコードの現在地を埋める
     return
