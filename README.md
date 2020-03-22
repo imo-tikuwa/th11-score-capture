@@ -20,6 +20,11 @@ python app.rb
 ```
 
 ## メモ
+スペルカードについてPhotoshopで切り抜きとかした後、そのままでは画像がうまく読み込めない模様。  
+「libpng warning: iCCP: known incorrect sRGB profile」  というエラーが出てた。  
+ImageMagickでexif情報を削除するバッチ(sh\strip_sample_spell_cards.bat)を実行する必要あり。
+
+## 履歴
 2020/03/22  
 ざっくり完成した模様  
 めちゃくちゃ汚いコードなので直せるところは直したい
