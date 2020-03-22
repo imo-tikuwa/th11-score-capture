@@ -33,6 +33,10 @@ SAMPLE_BOSS_NAMES_DIR = SAMPLE_DIR + 'boss_name' + os.sep
 SAMPLE_BOSS_REMAINS_DIR = SAMPLE_DIR + 'boss_remain' + os.sep
 SAMPLE_SPELL_CARDS_DIR = SAMPLE_DIR + 'spell_card' + os.sep
 SAMPLE_STAGE_CLEARS_DIR = SAMPLE_DIR + 'stage_clear' + os.sep
+SAMPLE_ENEMY_ICONS_DIR = SAMPLE_DIR + 'enemy_icon' + os.sep
+SAMPLE_TIME_REMAINS_DIR = SAMPLE_DIR + 'time_remain' + os.sep
+TH11_WINDOW_ALLOW_WIDTH = 1280
+TH11_WINDOW_ALLOW_HEIGHT = 960
 SLEEP_SECOND = 3
 STAGE_CLEAR_TXT = 'STAGE CLEAR'
 DIFFICULTY_EASY = 0
@@ -676,6 +680,12 @@ LAST_SPELL_CARDS = {}
 # ステージクリアのROI
 STAGE_CLEAR_ROI = (227, 212, 673, 272)
 
+# ENEMYアイコンのROI
+ENEMY_ICON_ROI = (64, 930, 831, 955)
+
+# 残り時間(小数点1桁目)のROI
+TIME_REMAIN_ROI = (808, 44, 820, 64)
+
 
 # スコアのサンプルデータ(0～9)
 BINARY_NUMBERS = []
@@ -716,6 +726,18 @@ BINARY_STAGE_CLEARS = []
 for index in range(6):
     img = cv2.imread(SAMPLE_STAGE_CLEARS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
     BINARY_STAGE_CLEARS.append(img)
+
+# エネミーアイコンのサンプルデータ
+BINARY_ENEMY_ICONS = []
+for index in range(2):
+    img = cv2.imread(SAMPLE_ENEMY_ICONS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
+    BINARY_ENEMY_ICONS.append(img)
+
+# 残り時間のサンプルデータ
+BINARY_TIME_REMAINS = []
+for index in range(10):
+    img = cv2.imread(SAMPLE_TIME_REMAINS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
+    BINARY_TIME_REMAINS.append(img)
 
 
 def config_init():
@@ -1073,6 +1095,37 @@ def convert_stage_clear(is_stage_clear):
     return ''
 
 
+def check_is_boss_attack(boss_name, work_frame):
+    # ボス戦中かどうかを判定
+    # 確実な方法がないので複数の判定を持つことにする
+
+    # ボス名が取得できていたらTrue
+    # 自機がボス名に重なると透明になるのでたまに取れない
+    if (boss_name is not None):
+        return True
+
+    # プレイ画面下部のENEMYアイコンが検出出来たらTrue
+    # 撃破直前になると点滅するのでたまに取れない
+    clopped_frame = work_frame[ENEMY_ICON_ROI[1]:ENEMY_ICON_ROI[3], ENEMY_ICON_ROI[0]:ENEMY_ICON_ROI[2]]
+    for num, template_img in enumerate(BINARY_ENEMY_ICONS):
+        res = cv2.matchTemplate(clopped_frame, template_img, cv2.TM_CCORR_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+#         print(min_val, max_val, min_loc, max_loc)
+        if (max_val > 0.95):
+            return True
+
+    # プレイ画面右上の残り時間の小数点桁が検出出来たらTrue
+    # 弾幕の重なり具合なんかでたまに取れない
+    clopped_frame = work_frame[TIME_REMAIN_ROI[1]:TIME_REMAIN_ROI[3], TIME_REMAIN_ROI[0]:TIME_REMAIN_ROI[2]]
+    for num, template_img in enumerate(BINARY_TIME_REMAINS):
+        res = cv2.matchTemplate(clopped_frame, template_img, cv2.TM_CCORR_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+#         print(min_val, max_val, min_loc, max_loc)
+        if (max_val > 0.98):
+            return True
+
+    return False
+
 def check_is_last_spell(spell_card):
     # ラストスペルカードかどうか判定
     if (spell_card is None):
@@ -1138,8 +1191,6 @@ def inconsistency_check(output, difficulty, boss_name, boss_remain, spell_card):
         dictionary = SPELL_CARD_AND_REMAIN_DICTIONARY[difficulty]
         if (spell_card in dictionary.keys()):
             dictionary_remain = dictionary[spell_card]
-            print(dictionary_remain)
-            print(boss_remain)
             if (boss_remain != dictionary_remain):
                 if (output):
                     print("ボス残機とスペルカードの状況が矛盾してるようです。スキップします")

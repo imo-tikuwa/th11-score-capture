@@ -11,7 +11,8 @@ from termcolor import colored
 from commons import *
 
 @click.command()
-def main():
+@click.option('--development','-dev',is_flag=True)
+def main(development):
 
     # コンフィグ初期化
     config = config_init()
@@ -31,8 +32,8 @@ def main():
             capture_area = ajust_capture_position(rect_left, rect_top, rect_right, rect_bottom)
 
             # 指定した領域内をクリッピング
-            current_time = datetime.now().strftime('%Y%m%d%H%M%S')
-            original_frame = get_original_frame(capture_area, current_time, True)
+            current_time = datetime.now().strftime('%Y%m%d%H%M%S%f')
+            original_frame = get_original_frame(capture_area, current_time, development)
 
             # スコアの画像を保存（グレイズにも使用）
             for index, roi in enumerate(SCORE_ROIS):
@@ -43,6 +44,11 @@ def main():
 #                 cv2.imwrite(file_name, clopped_frame)
                 # Pillowで保存
                 Image.fromarray(clopped_frame).save(file_name)
+
+            # スコアの画像を保存（グレイズにも使用）
+            clopped_frame = original_frame[TIME_REMAIN_ROI[1]:TIME_REMAIN_ROI[3], TIME_REMAIN_ROI[0]:TIME_REMAIN_ROI[2]]
+            file_name = OUTPUT_DIR + current_time + '_time_remain.png'
+            Image.fromarray(clopped_frame).save(file_name)
 
             # 残機の画像を保存
             for index, roi in enumerate(REMAIN_ROIS):

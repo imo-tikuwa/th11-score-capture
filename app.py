@@ -21,6 +21,12 @@ def main(development, output):
     # 地霊殿のハンドルを起動、起動してなかったら起動
     th11_handle = execute_th11(config)
 
+    # ウィンドウサイズチェック
+    rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
+    if (rect_right - rect_left < TH11_WINDOW_ALLOW_WIDTH or rect_bottom - rect_top < TH11_WINDOW_ALLOW_HEIGHT):
+        print(colored("東方地霊殿は1280x960のウィンドウサイズで起動してください", "yellow"))
+        exit(0)
+
     # スコア、残機の辺りを抽出する
     # スコアの表示は確認したところ等間隔なので1文字ずつ抽出した方が簡単そう
     results = []
@@ -40,7 +46,7 @@ def main(development, output):
             current_time = datetime.now().strftime('%Y%m%d%H%M%S%f')
             original_frame = get_original_frame(capture_area, current_time, development)
 
-            # 二値化
+            # グレースケール化
             work_frame = edit_frame(original_frame)
 
             # 難易度についてテンプレートマッチング
@@ -66,6 +72,9 @@ def main(development, output):
 
             # ボス名についてテンプレートマッチング
             boss_name = analyze_boss_name(original_frame)
+
+            # ボス戦中かどうかチェック
+            is_boss_attack = check_is_boss_attack(boss_name, work_frame)
 
             # ボス残機についてテンプレートマッチング
             boss_remain = analyze_boss_remain(original_frame, boss_name)
