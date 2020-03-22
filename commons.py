@@ -10,6 +10,7 @@ import tkinter, tkinter.filedialog, tkinter.messagebox
 # print出力に色付ける
 from termcolor import colored
 import colorama
+from builtins import enumerate
 colorama.init()
 # 設定ファイルを利用する
 import configparser
@@ -37,7 +38,7 @@ SAMPLE_ENEMY_ICONS_DIR = SAMPLE_DIR + 'enemy_icon' + os.sep
 SAMPLE_TIME_REMAINS_DIR = SAMPLE_DIR + 'time_remain' + os.sep
 TH11_WINDOW_ALLOW_WIDTH = 1280
 TH11_WINDOW_ALLOW_HEIGHT = 960
-SLEEP_SECOND = 3
+SLEEP_SECOND = 1
 STAGE_CLEAR_TXT = 'STAGE CLEAR'
 DIFFICULTY_EASY = 0
 DIFFICULTY_NORMAL = 1
@@ -61,17 +62,26 @@ BOSS_ORIN = 5
 BOSS_UTSUHO = 6
 BOSS_SANAE = 7
 BOSS_KOISHI = 8
+BOSS_KISUME_NAME = 'キスメ'
+BOSS_YAMAME_NAME = '黒谷ヤマメ'
+BOSS_PARSEE_NAME = '水橋パルスィ'
+BOSS_YUGI_NAME = '星熊勇儀'
+BOSS_SATORI_NAME = '古明地さとり'
+BOSS_ORIN_NAME = '火焔猫燐'
+BOSS_UTSUHO_NAME = '霊烏路空'
+BOSS_SANAE_NAME = '東風谷早苗'
+BOSS_KOISHI_NAME = '古明地こいし'
 BOSS_NAME_HASHMAP = {
                       None: '',
-                      BOSS_KISUME: 'キスメ',
-                      BOSS_YAMAME: '黒谷ヤマメ',
-                      BOSS_PARSEE: '水橋パルスィ',
-                      BOSS_YUGI: '星熊勇儀',
-                      BOSS_SATORI: '古明地さとり',
-                      BOSS_ORIN: '火焔猫燐',
-                      BOSS_UTSUHO: '霊烏路空',
-                      BOSS_SANAE: '東風谷早苗',
-                      BOSS_KOISHI: '古明地こいし'
+                      BOSS_KISUME: BOSS_KISUME_NAME,
+                      BOSS_YAMAME: BOSS_YAMAME_NAME,
+                      BOSS_PARSEE: BOSS_PARSEE_NAME,
+                      BOSS_YUGI: BOSS_YUGI_NAME,
+                      BOSS_SATORI: BOSS_SATORI_NAME,
+                      BOSS_ORIN: BOSS_ORIN_NAME,
+                      BOSS_UTSUHO: BOSS_UTSUHO_NAME,
+                      BOSS_SANAE: BOSS_SANAE_NAME,
+                      BOSS_KOISHI: BOSS_KOISHI_NAME
 }
 BOSSNAME2STAGE_HASHMAP = {
                           None: '',
@@ -308,6 +318,151 @@ SPELL_CARD_NAME_DICTIONARY = {
                                        11: '「嫌われ者のフィロソフィ」',
                                        12: '「サブタレイニアンローズ」',
                                        }
+}
+# スペルカード以外の現在地情報
+# 難易度 > ボス名 > ボス残機 で現在地を特定する
+TIME_TABLES = {
+               DIFFICULTY_EASY: {
+                                 BOSS_KISUME: {
+                                               None: BOSS_KISUME_NAME + '通常',
+                                               },
+                                 BOSS_YAMAME: {
+                                               1:    BOSS_YAMAME_NAME + '通常1',
+                                               None: BOSS_YAMAME_NAME + '通常2',
+                                               },
+                                 BOSS_PARSEE: {
+                                               1:    BOSS_PARSEE_NAME + '通常1',
+                                               None: BOSS_PARSEE_NAME + '通常2',
+                                               },
+                                 BOSS_YUGI:   {
+                                               2:    BOSS_YUGI_NAME + '通常1',
+                                               1:    BOSS_YUGI_NAME + '通常2',
+                                               },
+                                 BOSS_SATORI: {
+                                               2:    BOSS_SATORI_NAME + '通常1',
+                                               1:    BOSS_SATORI_NAME + '通常2',
+                                               },
+                                 BOSS_ORIN:   {
+                                               3:    BOSS_ORIN_NAME + '通常1',
+                                               2:    BOSS_ORIN_NAME + '通常2',
+                                               1:    BOSS_ORIN_NAME + '通常3',
+                                               },
+                                 BOSS_UTSUHO: {
+                                               4:    BOSS_UTSUHO_NAME + '通常1',
+                                               3:    BOSS_UTSUHO_NAME + '通常2',
+                                               2:    BOSS_UTSUHO_NAME + '通常3',
+                                               1:    BOSS_UTSUHO_NAME + '通常4',
+                                               },
+                                 },
+               DIFFICULTY_NORMAL: {
+                                 BOSS_KISUME: {
+                                               None: BOSS_KISUME_NAME + '通常',
+                                               },
+                                 BOSS_YAMAME: {
+                                               1:    BOSS_YAMAME_NAME + '通常1',
+                                               None: BOSS_YAMAME_NAME + '通常2',
+                                               },
+                                 BOSS_PARSEE: {
+                                               1:    BOSS_PARSEE_NAME + '通常1',
+                                               None: BOSS_PARSEE_NAME + '通常2',
+                                               },
+                                 BOSS_YUGI:   {
+                                               2:    BOSS_YUGI_NAME + '通常1',
+                                               1:    BOSS_YUGI_NAME + '通常2',
+                                               },
+                                 BOSS_SATORI: {
+                                               2:    BOSS_SATORI_NAME + '通常1',
+                                               1:    BOSS_SATORI_NAME + '通常2',
+                                               },
+                                 BOSS_ORIN:   {
+                                               3:    BOSS_ORIN_NAME + '通常1',
+                                               2:    BOSS_ORIN_NAME + '通常2',
+                                               1:    BOSS_ORIN_NAME + '通常3',
+                                               },
+                                 BOSS_UTSUHO: {
+                                               4:    BOSS_UTSUHO_NAME + '通常1',
+                                               3:    BOSS_UTSUHO_NAME + '通常2',
+                                               2:    BOSS_UTSUHO_NAME + '通常3',
+                                               1:    BOSS_UTSUHO_NAME + '通常4',
+                                               },
+                                   },
+               DIFFICULTY_HARD: {
+                                 BOSS_KISUME: {
+                                               None: BOSS_KISUME_NAME + '通常',
+                                               },
+                                 BOSS_YAMAME: {
+                                               1:    BOSS_YAMAME_NAME + '通常1',
+                                               None: BOSS_YAMAME_NAME + '通常2',
+                                               },
+                                 BOSS_PARSEE: {
+                                               1:    BOSS_PARSEE_NAME + '通常1',
+                                               None: BOSS_PARSEE_NAME + '通常2',
+                                               },
+                                 BOSS_YUGI:   {
+                                               2:    BOSS_YUGI_NAME + '通常1',
+                                               1:    BOSS_YUGI_NAME + '通常2',
+                                               },
+                                 BOSS_SATORI: {
+                                               2:    BOSS_SATORI_NAME + '通常1',
+                                               1:    BOSS_SATORI_NAME + '通常2',
+                                               },
+                                 BOSS_ORIN:   {
+                                               3:    BOSS_ORIN_NAME + '通常1',
+                                               2:    BOSS_ORIN_NAME + '通常2',
+                                               1:    BOSS_ORIN_NAME + '通常3',
+                                               },
+                                 BOSS_UTSUHO: {
+                                               4:    BOSS_UTSUHO_NAME + '通常1',
+                                               3:    BOSS_UTSUHO_NAME + '通常2',
+                                               2:    BOSS_UTSUHO_NAME + '通常3',
+                                               1:    BOSS_UTSUHO_NAME + '通常4',
+                                               },
+                                 },
+               DIFFICULTY_LUNATIC: {
+                                 BOSS_KISUME: {
+                                               None: BOSS_KISUME_NAME + '通常',
+                                               },
+                                 BOSS_YAMAME: {
+                                               1:    BOSS_YAMAME_NAME + '通常1',
+                                               None: BOSS_YAMAME_NAME + '通常2',
+                                               },
+                                 BOSS_PARSEE: {
+                                               1:    BOSS_PARSEE_NAME + '通常1',
+                                               None: BOSS_PARSEE_NAME + '通常2',
+                                               },
+                                 BOSS_YUGI:   {
+                                               2:    BOSS_YUGI_NAME + '通常1',
+                                               1:    BOSS_YUGI_NAME + '通常2',
+                                               },
+                                 BOSS_SATORI: {
+                                               2:    BOSS_SATORI_NAME + '通常1',
+                                               1:    BOSS_SATORI_NAME + '通常2',
+                                               },
+                                 BOSS_ORIN:   {
+                                               3:    BOSS_ORIN_NAME + '通常1',
+                                               2:    BOSS_ORIN_NAME + '通常2',
+                                               1:    BOSS_ORIN_NAME + '通常3',
+                                               },
+                                 BOSS_UTSUHO: {
+                                               4:    BOSS_UTSUHO_NAME + '通常1',
+                                               3:    BOSS_UTSUHO_NAME + '通常2',
+                                               2:    BOSS_UTSUHO_NAME + '通常3',
+                                               1:    BOSS_UTSUHO_NAME + '通常4',
+                                               },
+                                    },
+               DIFFICULTY_EXTRA:  {
+#                                  BOSS_SANAE:  {},                                                             },
+                                 BOSS_KOISHI: {
+                                               9:    BOSS_KOISHI_NAME + '通常1',
+                                               8:    BOSS_KOISHI_NAME + '通常2',
+                                               7:    BOSS_KOISHI_NAME + '通常3',
+                                               6:    BOSS_KOISHI_NAME + '通常4',
+                                               5:    BOSS_KOISHI_NAME + '通常5',
+                                               4:    BOSS_KOISHI_NAME + '通常6',
+                                               3:    BOSS_KOISHI_NAME + '通常7',
+                                               2:    BOSS_KOISHI_NAME + '通常8',
+                                               }
+                                   },
 }
 # スペルカードとボス残機のマッピングデータ
 SPELL_CARD_AND_REMAIN_DICTIONARY = {
@@ -613,6 +768,8 @@ CSV_INDEX_BOSS_NAME         = 4
 CSV_INDEX_BOSS_REMAIN       = 5
 CSV_INDEX_SPELL_CARD        = 6
 CSV_INDEX_CURRENT_POSITION  = 7
+# CSVファイルのヘッダ行
+CSV_HEADER_ROW = ['難易度', 'スコア', '残機', 'グレイズ', 'ボス', 'ボス残機', 'スペル', '現在地']
 
 # スコアのROI配列(10億、1億、1000万...の順)
 SCORE_ROIS = []
@@ -1140,13 +1297,21 @@ def save_csv(csv_name, results):
 
     # ボスやスペルなどのコード値を文字列に変換
     for index, row in enumerate(csv_data):
+
+        # 難易度、ボス名、ボス残機などの情報を元に辞書から現在地をセット
+        # スペルカード情報があればそれを優先してセット
+        if (row[CSV_INDEX_SPELL_CARD] is not None):
+            csv_data[index][CSV_INDEX_CURRENT_POSITION] = convert_spell_card(row[CSV_INDEX_SPELL_CARD])
+        elif (row[CSV_INDEX_BOSS_NAME] is not None):
+            csv_data[index][CSV_INDEX_CURRENT_POSITION] = TIME_TABLES[row[CSV_INDEX_DIFFICULTY]][row[CSV_INDEX_BOSS_NAME]][row[CSV_INDEX_BOSS_REMAIN]]
+
         csv_data[index][CSV_INDEX_DIFFICULTY] = convert_difficulty(row[CSV_INDEX_DIFFICULTY])
         csv_data[index][CSV_INDEX_BOSS_NAME] = convert_boss_name(row[CSV_INDEX_BOSS_NAME])
         csv_data[index][CSV_INDEX_BOSS_REMAIN] = convert_boss_remain(row[CSV_INDEX_BOSS_REMAIN], row[CSV_INDEX_BOSS_NAME])
         csv_data[index][CSV_INDEX_SPELL_CARD] = convert_spell_card(row[CSV_INDEX_SPELL_CARD])
 
     # ヘッダ追加
-    csv_data.insert(0, ['難易度', 'スコア', '残機', 'グレイズ', 'ボス', 'ボス残機', 'スペル', '現在地'])
+    csv_data.insert(0, CSV_HEADER_ROW)
 
     # CSV保存
     with open(OUTPUT_DIR + csv_name, "w", newline="") as file:
@@ -1154,11 +1319,6 @@ def save_csv(csv_name, results):
         writer.writerows(csv_data)
 
     return True
-
-
-def fill_current_position(results):
-    # ボス名、ボス残機、スペルカードなどの情報から各レコードの現在地を埋める
-    return
 
 
 def output_console(current_time, difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position):
@@ -1178,13 +1338,18 @@ def output_console(current_time, difficulty, score, remain, graze, boss_name, bo
     return
 
 
-def inconsistency_check(output, difficulty, boss_name, boss_remain, spell_card):
+def inconsistency_check(output, difficulty, boss_name, is_boss_attack, boss_remain, spell_card):
     # マッチングにより取得したデータの矛盾チェック
     # おかしなことになってるデータを検出できたときFalseを返す
     # 例えば、自機が画面左上にいった時にボス名欄が透明になるため、ボス名が空なのにスペルカード名が存在するという状況が発生しうる
     if (boss_name is None and spell_card is not None):
         if (output):
             print("ボス名が空に対して、スペルカードが存在するためスキップします")
+        return False
+
+    if (is_boss_attack is False and spell_card is not None):
+        if (output):
+            print("ボス戦判定がFalseに対して、スペルカードが存在するためスキップします")
         return False
 
     if (difficulty is not None):
@@ -1197,3 +1362,73 @@ def inconsistency_check(output, difficulty, boss_name, boss_remain, spell_card):
                 return False
 
     return True
+
+
+def output_csv(results):
+    # CSV出力処理
+
+    # 重複を含めたすべてのデータをCSV出力
+    save_datetime = datetime.now().strftime('%Y%m%d%H%M%S')
+    save_csv(save_datetime + '_all_result.csv', results)
+
+    # 重複を除外した配列データを作成する
+    squeezed_results = []
+    # 最後に追加したデータ
+    last_append_result = None
+    for index, result in enumerate(results):
+        # 直前のデータとボス名、ボス残機、スペルカードなどが違うとき配列に格納(古いものが残るようにする)
+        if (
+            last_append_result is None
+            or last_append_result[CSV_INDEX_BOSS_NAME] != result[CSV_INDEX_BOSS_NAME]
+            or last_append_result[CSV_INDEX_BOSS_REMAIN] != result[CSV_INDEX_BOSS_REMAIN]
+            or last_append_result[CSV_INDEX_SPELL_CARD] != result[CSV_INDEX_SPELL_CARD]
+            or last_append_result[CSV_INDEX_CURRENT_POSITION] != result[CSV_INDEX_CURRENT_POSITION]
+            ):
+            last_append_result = result
+            squeezed_results.append(last_append_result)
+
+        # ステージクリアのデータだけは例外として新しいものが残るように常に上書きする
+        elif (result[CSV_INDEX_CURRENT_POSITION] == STAGE_CLEAR_TXT):
+            last_append_result = result
+            squeezed_results[-1] = result
+
+
+    # CSVデータの補正処理
+    # ステージクリアとラストスペルの間に入ってしまう余計なデータをここで削除
+    # スペルカード中に入り込んでしまったゴミデータの削除をここで実施(スペルカードA、未検出、スペルカードAみたいなデータの未検出を削除する)
+    for current_index in reversed(range(len(squeezed_results))):
+        # current_numのレコードを中心に前、現在、後の3レコードを取得
+        current = squeezed_results[current_index]
+        prev = next = None
+        if (current_index > 0):
+            prev = squeezed_results[current_index - 1]
+        if (current_index < len(squeezed_results) - 1):
+            next = squeezed_results[current_index + 1]
+
+        # currentのスペルカードが空、prevのスペルカードが存在する、nextの現在地がSTAGE CLEARのときcurrentを削除
+        if (prev is not None
+            and next is not None
+            and current[CSV_INDEX_SPELL_CARD] is None
+            and prev[CSV_INDEX_SPELL_CARD] is not None
+            and next[CSV_INDEX_CURRENT_POSITION] == STAGE_CLEAR_TXT
+            ):
+            del squeezed_results[current_index]
+            continue
+
+        # prevとnextのスペルカードが存在する、currentのスペルカードは存在しないとき、誤検出とみなしてcurrentを削除
+        if (prev is not None
+            and next is not None
+            and current[CSV_INDEX_SPELL_CARD] is None
+            and prev[CSV_INDEX_SPELL_CARD] is not None
+            and next[CSV_INDEX_SPELL_CARD] is not None
+            and prev[CSV_INDEX_SPELL_CARD] == next[CSV_INDEX_SPELL_CARD]
+            ):
+            del squeezed_results[current_index]
+            continue
+
+
+    # 重複を除外したデータをCSV出力
+    save_csv(save_datetime + '_result.csv', squeezed_results)
+    print(colored("結果をCSVに出力しました。", "green"))
+
+    return

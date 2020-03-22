@@ -83,7 +83,7 @@ def main(development, output):
             spell_card = analyze_spell_card(original_frame, boss_name)
 
             # 矛盾した状態が発生したときスキップする
-            if (inconsistency_check(output, difficulty, boss_name, boss_remain, spell_card) is False):
+            if (inconsistency_check(output, difficulty, boss_name, is_boss_attack, boss_remain, spell_card) is False):
                 continue
 
             # ラストスペルのときステージクリアの瞬間をキャプチャするため一時的に処理間隔を0.5秒に変更
@@ -114,61 +114,7 @@ def main(development, output):
 
     # CSV出力
     if (len(results) > 0):
-
-        # 重複を含めたすべてのデータをCSV出力
-        save_datetime = datetime.now().strftime('%Y%m%d%H%M%S')
-        save_csv(save_datetime + '_all_result.csv', results)
-
-        # ため込んだデータをforループして末尾のデータから順番に検証、以下の処理を実施
-        # 1. スペルカードが重複するデータを削除する(古いものが残るようにする)
-        # 2. currentのボス名が空、prevとnextのボス名が存在するときcurrentを会話中orデータ取得に失敗とみなし削除
-        results_length = len(results)
-        for current_index in reversed(range(results_length)):
-            # current_numのレコードを中心に前、現在、後の3レコードを取得
-            current = results[current_index]
-            prev = next = None
-            if (current_index > 0):
-                prev = results[current_index - 1]
-            if (current_index < len(results) - 1):
-                next = results[current_index + 1]
-
-            # currentとprevのcurrent_positionが「STAGE CLEAR」のとき最終スコアを記録するため例外として古いもの(current)を残すようにする
-            if (current[CSV_INDEX_CURRENT_POSITION] == STAGE_CLEAR_TXT
-                and prev is not None
-                and prev[CSV_INDEX_CURRENT_POSITION] == STAGE_CLEAR_TXT
-                ):
-                continue
-
-            # currentとnextのcurrent_positionが「STAGE CLEAR」のとき最終スコアを記録するため
-            # 例外として古いもの(current)を残すようnext側を削除
-            if (current[CSV_INDEX_CURRENT_POSITION] == STAGE_CLEAR_TXT
-                and next is not None
-                and next[CSV_INDEX_CURRENT_POSITION] == STAGE_CLEAR_TXT
-                ):
-                del results[current_index + 1]
-                continue
-
-            # prevのレコードとcurrentのレコードのボス名、ボス残機、スペルカードが一致していたらcurrentは重複と見なして削除
-            if (prev is not None
-                 and current[CSV_INDEX_BOSS_NAME] == prev[CSV_INDEX_BOSS_NAME]
-                 and current[CSV_INDEX_BOSS_REMAIN] == prev[CSV_INDEX_BOSS_REMAIN]
-                 and current[CSV_INDEX_SPELL_CARD] == prev[CSV_INDEX_SPELL_CARD]
-                 and current[CSV_INDEX_CURRENT_POSITION] != STAGE_CLEAR_TXT
-                 ):
-                del results[current_index]
-                continue
-
-            # currentのボス名が空、prevとnextのボス名が存在するとき会話中orデータ取得に失敗とみなしてcurrentを削除
-            if (prev is not None and next is not None):
-                if (current[CSV_INDEX_BOSS_NAME] == '' and prev[CSV_INDEX_BOSS_NAME] != '' and next[CSV_INDEX_BOSS_NAME] != '' and prev[CSV_INDEX_BOSS_NAME] == next[CSV_INDEX_BOSS_NAME]):
-                    del results[current_index]
-                    continue
-
-        # 重複を削除したデータをCSV出力
-        save_csv(save_datetime + '_result.csv', results)
-        print(colored("結果をCSVに出力しました。", "green"))
-
-
+        output_csv(results)
 
 if __name__ == '__main__':
     main()
