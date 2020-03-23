@@ -92,7 +92,7 @@ def main(development, output):
                 sleep_second = 0.5
 
             # ステージクリアについてテンプレートマッチング
-            is_stage_clear = analyze_stage_clear(work_frame)
+            is_stage_clear = analyze_stage_clear(original_frame, work_frame)
             if (is_stage_clear):
                 sleep_second = SLEEP_SECOND
 

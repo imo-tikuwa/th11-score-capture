@@ -9,6 +9,7 @@ import glob
 
 
 # 変数(定数扱いする変数)
+OUTPUT_DIR = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'output' + os.sep
 SAMPLE_DIR = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'sample_data' + os.sep
 SAMPLE_NUMBERS_DIR = SAMPLE_DIR + 'number' + os.sep
 SAMPLE_REMAINS_DIR = SAMPLE_DIR + 'remain' + os.sep
@@ -67,8 +68,8 @@ for index in range(9):
 
 # ボス残機のサンプルデータ(緑色の星画像で固定)
 # ボス残機は薄い緑（R:233、G:244、B:225）～濃い緑（R:89、G:172、B:21）なので色を指定して二値化してから使用する
-BINARY_BOSS_REMAIN = cv2.imread(SAMPLE_BOSS_REMAINS_DIR + '0.png')
-BINARY_BOSS_REMAIN = cv2.inRange(BINARY_BOSS_REMAIN, (21, 172, 89), (225, 244, 233))
+img = cv2.imread(SAMPLE_BOSS_REMAINS_DIR + '0.png')
+BINARY_BOSS_REMAIN = cv2.inRange(img, (21, 172, 89), (225, 244, 233))
 
 # スペルカードのサンプルデータ(難易度を元に動的に切り替え)
 BINARY_SPELL_CARDS = [[],[],[],[],[]]
@@ -88,10 +89,15 @@ for index, difficulty in enumerate(DIFFICULTY_HASHMAP):
 
 
 # ステージクリアのサンプルデータ(1～6面およびリプレイ再生時のALLクリア用の2種類)
+# 0.pngは1～5面用、精度を上げるため赤（R:255、G:0、B:0）～濃い赤（R:136、G:0、B:0）の範囲で二値化する
 BINARY_STAGE_CLEARS = []
-for index in range(6):
-    img = cv2.imread(SAMPLE_STAGE_CLEARS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
-    BINARY_STAGE_CLEARS.append(img)
+img = cv2.imread(SAMPLE_STAGE_CLEARS_DIR + '0.png')
+img = cv2.inRange(img, (0, 0, 136), (0, 0, 255))
+# cv2.imwrite(OUTPUT_DIR + 'stage_clear0.png', img)
+BINARY_STAGE_CLEARS.append(img)
+# 1.pngリプレイ再生時のALLクリア用、特に弄らずにグレースケール化したものと一致するみたい
+img = cv2.imread(SAMPLE_STAGE_CLEARS_DIR + '1.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
+BINARY_STAGE_CLEARS.append(img)
 
 
 # エネミーアイコンのサンプルデータ
