@@ -1280,7 +1280,16 @@ def save_csv(csv_name, results):
         if (row[CSV_INDEX_SPELL_CARD] is not None):
             csv_data[index][CSV_INDEX_CURRENT_POSITION] = convert_spell_card(row[CSV_INDEX_SPELL_CARD])
         elif (row[CSV_INDEX_BOSS_NAME] is not None):
-            csv_data[index][CSV_INDEX_CURRENT_POSITION] = TIME_TABLES[row[CSV_INDEX_DIFFICULTY]][row[CSV_INDEX_BOSS_NAME]][row[CSV_INDEX_BOSS_REMAIN]]
+            try:
+                csv_data[index][CSV_INDEX_CURRENT_POSITION] = TIME_TABLES[row[CSV_INDEX_DIFFICULTY]][row[CSV_INDEX_BOSS_NAME]][row[CSV_INDEX_BOSS_REMAIN]]
+            except KeyError:
+                # 3面～6面はboss_remainがNoneの状態の通常が存在しないのでtry-exceptでエラー落ち回避
+                pass
+#                 print("KeyError Exception.")
+#                 print(row[CSV_INDEX_DIFFICULTY])
+#                 print(row[CSV_INDEX_BOSS_NAME])
+#                 print(row[CSV_INDEX_BOSS_REMAIN])
+
 
         csv_data[index][CSV_INDEX_DIFFICULTY] = convert_difficulty(row[CSV_INDEX_DIFFICULTY])
         csv_data[index][CSV_INDEX_BOSS_NAME] = convert_boss_name(row[CSV_INDEX_BOSS_NAME])
