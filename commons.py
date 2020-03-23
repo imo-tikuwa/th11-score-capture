@@ -1181,20 +1181,24 @@ def analyze_stage_clear(original_frame, work_frame):
     # ステージクリアをテンプレートマッチングにより取得
     is_stage_clear = False
 
-    for num in range(2):
-        if (num == 0):
-            # 0のとき赤（R:255、G:0、B:0）～濃い赤（R:136、G:0、B:0）の範囲で二値化したサンプルデータとのマッチング
-            clopped_frame = original_frame[STAGE_CLEAR_ROI[1]:STAGE_CLEAR_ROI[3], STAGE_CLEAR_ROI[0]:STAGE_CLEAR_ROI[2]]
-            clopped_frame = cv2.cvtColor(clopped_frame, cv2.COLOR_RGB2BGR)
-            clopped_frame = cv2.inRange(clopped_frame, (0, 0, 136), (0, 0, 255))
-        else:
-            # 0以外のときグレースケール化されたフレームでテンプレートマッチング
-            clopped_frame = work_frame[STAGE_CLEAR_ROI[1]:STAGE_CLEAR_ROI[3], STAGE_CLEAR_ROI[0]:STAGE_CLEAR_ROI[2]]
+    # 赤（R:255、G:0、B:0）～濃い赤（R:136、G:0、B:0）の範囲で二値化したサンプルデータとのマッチング
+    clopped_frame = original_frame[STAGE_CLEAR_ROI[1]:STAGE_CLEAR_ROI[3], STAGE_CLEAR_ROI[0]:STAGE_CLEAR_ROI[2]]
+    clopped_frame = cv2.cvtColor(clopped_frame, cv2.COLOR_RGB2BGR)
+    clopped_frame = cv2.inRange(clopped_frame, (0, 0, 136), (0, 0, 255))
+    res = cv2.matchTemplate(clopped_frame, BINARY_STAGE_CLEARS[0], cv2.TM_CCORR_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+#     print(min_val, max_val, min_loc, max_loc)
+    if (max_val > 0.98):
+        return True
+
+    for num in range(1,7):
+        # グレースケール化されたフレームでテンプレートマッチング
+        clopped_frame = work_frame[STAGE_CLEAR_ROI[1]:STAGE_CLEAR_ROI[3], STAGE_CLEAR_ROI[0]:STAGE_CLEAR_ROI[2]]
 
         res = cv2.matchTemplate(clopped_frame, BINARY_STAGE_CLEARS[num], cv2.TM_CCORR_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 #         print(min_val, max_val, min_loc, max_loc)
-        if (max_val > 0.98):
+        if (max_val > 0.96):
             is_stage_clear = True
             break
 

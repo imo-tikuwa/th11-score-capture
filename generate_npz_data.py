@@ -89,15 +89,16 @@ for index, difficulty in enumerate(DIFFICULTY_HASHMAP):
 
 
 # ステージクリアのサンプルデータ(1～6面およびリプレイ再生時のALLクリア用の2種類)
-# 0.pngは1～5面用、精度を上げるため赤（R:255、G:0、B:0）～濃い赤（R:136、G:0、B:0）の範囲で二値化する
+# STAGE CLEARの表示は固定なので、赤（R:255、G:0、B:0）～濃い赤（R:136、G:0、B:0）の範囲で二値化する
 BINARY_STAGE_CLEARS = []
 img = cv2.imread(SAMPLE_STAGE_CLEARS_DIR + '0.png')
 img = cv2.inRange(img, (0, 0, 136), (0, 0, 255))
 # cv2.imwrite(OUTPUT_DIR + 'stage_clear0.png', img)
 BINARY_STAGE_CLEARS.append(img)
-# 1.pngリプレイ再生時のALLクリア用、特に弄らずにグレースケール化したものと一致するみたい
-img = cv2.imread(SAMPLE_STAGE_CLEARS_DIR + '1.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
-BINARY_STAGE_CLEARS.append(img)
+# 0.pngの二値化のマッチングがうまく行かなかったとき用に通常のグレースケールの画像についてもマッチングを実施する
+for index in range(6):
+    img = cv2.imread(SAMPLE_STAGE_CLEARS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
+    BINARY_STAGE_CLEARS.append(img)
 
 
 # エネミーアイコンのサンプルデータ
