@@ -1278,6 +1278,21 @@ def save_csv(csv_name, results):
     # CSV書き込み処理
     csv_data = copy.deepcopy(results)
 
+    # ヘッダ追加
+    csv_data.insert(0, CSV_HEADER_ROW)
+
+    # CSV保存
+    with open(OUTPUT_DIR + csv_name, "w", newline="") as file:
+        writer = csv.writer(file, delimiter=",")
+        writer.writerows(csv_data)
+
+    return True
+
+
+def append_current_position(results):
+    # データ配列に現在地を追加
+    csv_data = copy.deepcopy(results)
+
     # ボスやスペルなどのコード値を文字列に変換
     for index, row in enumerate(csv_data):
 
@@ -1296,21 +1311,12 @@ def save_csv(csv_name, results):
 #                 print(row[CSV_INDEX_BOSS_NAME])
 #                 print(row[CSV_INDEX_BOSS_REMAIN])
 
-
         csv_data[index][CSV_INDEX_DIFFICULTY] = convert_difficulty(row[CSV_INDEX_DIFFICULTY])
         csv_data[index][CSV_INDEX_BOSS_NAME] = convert_boss_name(row[CSV_INDEX_BOSS_NAME])
         csv_data[index][CSV_INDEX_BOSS_REMAIN] = convert_boss_remain(row[CSV_INDEX_BOSS_REMAIN], row[CSV_INDEX_BOSS_NAME])
         csv_data[index][CSV_INDEX_SPELL_CARD] = convert_spell_card(row[CSV_INDEX_SPELL_CARD])
 
-    # ヘッダ追加
-    csv_data.insert(0, CSV_HEADER_ROW)
-
-    # CSV保存
-    with open(OUTPUT_DIR + csv_name, "w", newline="") as file:
-        writer = csv.writer(file, delimiter=",")
-        writer.writerows(csv_data)
-
-    return True
+    return csv_data
 
 
 def output_console(current_time, difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position):
@@ -1361,7 +1367,8 @@ def output_csv(results):
 
     # 重複を含めたすべてのデータをCSV出力
     save_datetime = datetime.now().strftime('%Y%m%d%H%M%S')
-    save_csv(save_datetime + '_all_result.csv', results)
+    all_results = append_current_position(results)
+    save_csv(save_datetime + '_all_result.csv', all_results)
 
     # 重複を除外した配列データを作成する
     squeezed_results = []
@@ -1385,7 +1392,7 @@ def output_csv(results):
             squeezed_results[-1] = result
 
 
-    # CSVデータの補正処理
+    # CSVデータの補正処理1
     # ステージクリアとラストスペルの間に入ってしまう余計なデータをここで削除
     # スペルカード中に入り込んでしまったゴミデータの削除をここで実施(スペルカードA、未検出、スペルカードAみたいなデータの未検出を削除する)
     for current_index in reversed(range(len(squeezed_results))):
@@ -1418,6 +1425,42 @@ def output_csv(results):
             del squeezed_results[current_index]
             continue
 
+    # データ配列に現在地を付与する
+    squeezed_results = append_current_position(squeezed_results)
+
+    # CSVデータの補正処理2
+    # 再度重複をチェックしなおす
+    # (「ニュークリアエクスカーション」⇒「霊烏路空通常1」⇒「ニュークリアエクスカーション」...のような)マッチングとなってしまった時の重複を削除する
+    for current_index in reversed(range(len(squeezed_results))):
+        # current_numのレコードを中心に前、現在の2レコードを取得
+        current = squeezed_results[current_index]
+        prev = None
+        if (current_index > 0):
+            prev = squeezed_results[current_index - 1]
+
+        # currentのスペルカードとprevのスペルカードが一致するときcurrentを削除
+        if (prev is not None
+            and current[CSV_INDEX_CURRENT_POSITION] is not None
+            and prev[CSV_INDEX_CURRENT_POSITION] is not None
+            and prev[CSV_INDEX_CURRENT_POSITION] == current[CSV_INDEX_CURRENT_POSITION]
+            ):
+            del squeezed_results[current_index]
+            continue
+
+    # CSVデータの補正処理3
+    # 補正処理2の後にボス名が存在し、現在地が空のデータはゴミと見なして削除する
+    # また、ボス名と現在値が空のデータは道中という判定見なす
+    for current_index in reversed(range(len(squeezed_results))):
+        current = squeezed_results[current_index]
+
+        # ボス名が存在し、現在地が空のデータはゴミと見なして削除する
+        if (len(current[CSV_INDEX_BOSS_NAME]) > 0 and len(current[CSV_INDEX_CURRENT_POSITION]) == 0):
+            del squeezed_results[current_index]
+            continue
+
+        # ボス名と現在値が空のデータは道中という判定見なす
+        if (len(current[CSV_INDEX_BOSS_NAME]) == 0 and len(current[CSV_INDEX_CURRENT_POSITION]) == 0):
+            squeezed_results[current_index][CSV_INDEX_CURRENT_POSITION] = '道中'
 
     # 重複を除外したデータをCSV出力
     save_csv(save_datetime + '_result.csv', squeezed_results)
