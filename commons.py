@@ -879,6 +879,22 @@ BINARY_ENEMY_ICONS = NPZ_DATA['enemy_icon']
 BINARY_TIME_REMAINS = NPZ_DATA['time_remain']
 
 
+def print_usage():
+    about = '-' * 80 + '\n'
+    about += '|{:^78}|\n'.format('th11 realtime capture')
+    about += '-' * 80 + '\n'
+    about += '|{:^75}|\n'.format('使い方')
+    about += '|' + (' ' * 78) +'|\n'
+    about += '| 1. (初回のみ) 実行ファイルの場所を指定する                                   |\n'
+    about += '| 2. 緑色でキャプチャ準備完了と表示されたらリプレイの再生を始める              |\n'
+    about += '|    ※キャプチャはゲーム画面を検出すると自動で行われます                      |\n'
+    about += '|    ※リプレイではなく直接プレイ中の画面をキャプチャすることも可能です        |\n'
+    about += '| 3. キャプチャを終了したいタイミングで Ctrl+C する                            |\n'
+    about += '|    ※結果はoutputディレクトリにCSVファイルとして出力されます                 |\n'
+    about += '-' * 80 + '\n'
+    print(colored(about, 'yellow', attrs=['bold']))
+    return
+
 def config_init():
     # コンフィグを初期化
     config = configparser.ConfigParser()
@@ -911,7 +927,7 @@ def execute_th11(config):
             th11_exe_file = tkinter.filedialog.askopenfilename(filetypes=file_type, initialdir=initial_dir)
 
             if th11_exe_file == "" or os.path.basename(th11_exe_file) != 'th11.exe':
-                print(colored("東方地霊殿の実行ファイルを指定してください。", "red"))
+                print(colored("東方地霊殿の実行ファイルを指定してください。", "red", attrs=['bold']))
                 sys.exit(1)
 
             # 設定ファイルにexeファイルのパス保存
@@ -935,12 +951,8 @@ def execute_th11(config):
             if th11_handle > 0:
                 break
 
-            print(colored("東方地霊殿が起動してないよー", "red"))
+            print(colored("東方地霊殿が起動してないよー", "red", attrs=['bold']))
             time.sleep(3)
-
-    print(colored("東方地霊殿が起動してるよー", "green"))
-    print(colored("東方地霊殿のハンドル：" + str(th11_handle), "green"))
-    print(colored("Ctrl+Cで終了します", "green"))
 
     return th11_handle
 
@@ -1326,9 +1338,11 @@ def append_current_position(results):
     return csv_data
 
 
-def output_console(current_time, difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position):
-    # コンソールにテンプレートマッチングの結果を出力する
-    print("----- {0}.png -----\n難易度　 ： {1}\nスコア　 ： {2}\n残機　　 ： {3}\nグレイズ ： {4}\nボス　　 ： {5}\nボス残機 ： {6}\nスペル　 ： {7}\n現在地　 ： {8}".format(
+def output_console(output, capture_count, current_time, difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position):
+    # outputオプションが有効なときコンソールにテンプレートマッチングの結果を出力する
+    # 無効なときは「キャプチャ中...」という文字を表示する
+    if (output):
+        print("----- {0}.png -----\n難易度　 ： {1}\nスコア　 ： {2}\n残機　　 ： {3}\nグレイズ ： {4}\nボス　　 ： {5}\nボス残機 ： {6}\nスペル　 ： {7}\n現在地　 ： {8}".format(
                                                                                                                                                  current_time,
                                                                                                                                                  convert_difficulty(difficulty),
                                                                                                                                                  str(score),
@@ -1339,7 +1353,11 @@ def output_console(current_time, difficulty, score, remain, graze, boss_name, bo
                                                                                                                                                  convert_spell_card(spell_card),
                                                                                                                                                  current_position
                                                                                                                                                  )
-                     )
+              )
+    else:
+        mod = capture_count % 10
+        dots = ('.' * mod) + (' ' * (10 - mod))
+        print("\rキャプチャ中" + dots, end='')
     return
 
 
@@ -1375,7 +1393,8 @@ def output_csv(results):
     # 重複を含めたすべてのデータをCSV出力
     save_datetime = datetime.now().strftime('%Y%m%d%H%M%S')
     all_results = append_current_position(results)
-    save_csv(save_datetime + '_all_result.csv', all_results)
+    all_result_csv = save_datetime + '_all_result.csv'
+    save_csv(all_result_csv, all_results)
 
     # 重複を除外した配列データを作成する
     squeezed_results = []
@@ -1470,7 +1489,8 @@ def output_csv(results):
             squeezed_results[current_index][CSV_INDEX_CURRENT_POSITION] = '道中'
 
     # 重複を除外したデータをCSV出力
-    save_csv(save_datetime + '_result.csv', squeezed_results)
-    print(colored("結果をCSVに出力しました。", "green"))
+    squeezed_result_csv = save_datetime + '_result.csv'
+    save_csv(squeezed_result_csv, squeezed_results)
+    print(colored("\n結果を以下のCSVに出力しました。\n全てのキャプチャ結果：{0}\n重複を除いたキャプチャ結果：{1}".format(all_result_csv, squeezed_result_csv), "green", attrs=['bold']))
 
     return

@@ -10,6 +10,7 @@ from termcolor import colored
 # 関数、定数をインポート
 from commons import *
 
+
 @click.command()
 @click.option('--development', '-dev', is_flag = True, help = "開発モード(outputディレクトリに解析に使用した画像を保存)")
 @click.option('--output', is_flag = True, help = "指定したときコンソールに暫定の解析結果の出力を行います")
@@ -17,24 +18,50 @@ from commons import *
 @click.option('--print-exec-time', is_flag = True, help = "テンプレートマッチング処理全体の処理時間を出力します。この数値を見てcapture-periodを設定するのを推奨")
 def main(development, output, capture_period, print_exec_time):
 
-    # コンフィグ初期化
-    config = config_init()
+    print_usage()
+    try:
 
-    # 地霊殿のハンドルを起動、起動してなかったら起動
-    th11_handle = execute_th11(config)
+        # コンフィグ初期化
+        config = config_init()
 
-    # ウィンドウサイズチェック
-    rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
-    if (rect_right - rect_left < TH11_WINDOW_ALLOW_WIDTH or rect_bottom - rect_top < TH11_WINDOW_ALLOW_HEIGHT):
-        print(colored("東方地霊殿は1280x960のウィンドウサイズで起動してください", "yellow"))
+        # 地霊殿のハンドルを起動、起動してなかったら起動
+        th11_handle = execute_th11(config)
+
+        # ウィンドウサイズチェック
+        rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
+        if (rect_right - rect_left < TH11_WINDOW_ALLOW_WIDTH or rect_bottom - rect_top < TH11_WINDOW_ALLOW_HEIGHT):
+            print(colored("東方地霊殿は1280x960のウィンドウサイズで起動してください", "red", attrs=['bold']))
+            exit(0)
+
+        # capture関数自体を丸ごと呼びなおしてスペルカードのサンプルデータなんかロードも全てやり直す
+        while (True):
+            csv_save = capture(th11_handle, development, output, capture_period, print_exec_time)
+            if (csv_save):
+                time.sleep(2)
+                print("\n続けてキャプチャする場合は c と\n終了する場合はそれ以外のキーを入力してください。")
+                cmd = input("入力：")
+                if cmd != "c":
+                    exit(0)
+            else:
+                # CSVを出力せずに抜けてきた場合はこのままプログラム自体を終了する
+                exit(0)
+
+    except KeyboardInterrupt:
         exit(0)
+
+
+def capture(th11_handle, development, output, capture_period, print_exec_time):
+    # キャプチャ処理
+    # CSVを保存したらTrue、しなかったらFalseを返す
 
     # スコア、残機の辺りを抽出する
     # スコアの表示は確認したところ等間隔なので1文字ずつ抽出した方が簡単そう
     results = []
     try:
+        print(colored("キャプチャ準備完了", "green", attrs=['bold']))
         current_difficulty = None
         sleep_second = capture_period
+        capture_count = 0
         while(True):
             if (sleep_second > 0):
                 time.sleep(sleep_second)
@@ -106,8 +133,7 @@ def main(development, output, capture_period, print_exec_time):
             current_position = convert_stage_clear(is_stage_clear)
 
             # コンソール出力
-            if (output):
-                output_console(current_time, difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position)
+            output_console(output, capture_count, current_time, difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position)
 
             # 結果を格納
             results.append([difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position])
@@ -115,16 +141,23 @@ def main(development, output, capture_period, print_exec_time):
             if (print_exec_time):
                 print("1回あたりの実行時間: {0}".format(time.time() - start_time))
 
+            capture_count += 1
+
     except pywintypes.error:
-        print(colored("\n\n東方地霊殿が終了したのでプログラムも終了します", "green"))
+        print(colored("\n\n東方地霊殿が終了したのでプログラムも終了します", "green", attrs=['bold']))
+        if (len(results) > 0):
+            output_csv(results)
 
     except KeyboardInterrupt:
-        print(colored("プログラムを終了します", "green"))
+        print(colored("\n\nキャプチャを終了します", "green", attrs=['bold']))
+        if (len(results) > 0):
+            output_csv(results)
+            return True
 
-    # CSV出力
-    if (len(results) > 0):
-        output_csv(results)
+    return False
+
 
 if __name__ == '__main__':
     main()
+
 
