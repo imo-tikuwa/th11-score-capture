@@ -11,9 +11,11 @@ from termcolor import colored
 from commons import *
 
 @click.command()
-@click.option('--development','-dev',is_flag=True) # 開発モードのとき解析に使用した画像を保管する
-@click.option('--output','-out',is_flag=True)      # コンソールにログを出力する
-def main(development, output):
+@click.option('--development', '-dev', is_flag = True, help = "開発モード(outputディレクトリに解析に使用した画像を保存)")
+@click.option('--output', is_flag = True, help = "指定したときコンソールに暫定の解析結果の出力を行います")
+@click.option('--capture-period', default = 1.0, type = click.FloatRange(0.0, 10.0), help = "画面のキャプチャ間隔(秒)")
+@click.option('--print-exec-time', is_flag = True, help = "テンプレートマッチング処理全体の処理時間を出力します。この数値を見てcapture-periodを設定するのを推奨")
+def main(development, output, capture_period, print_exec_time):
 
     # コンフィグ初期化
     config = config_init()
@@ -32,10 +34,13 @@ def main(development, output):
     results = []
     try:
         current_difficulty = None
-        sleep_second = SLEEP_SECOND
+        sleep_second = capture_period
         while(True):
             if (sleep_second > 0):
                 time.sleep(sleep_second)
+
+            if (print_exec_time):
+                start_time = time.time()
 
             rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
 
@@ -86,15 +91,16 @@ def main(development, output):
             if (inconsistency_check(output, difficulty, boss_name, is_boss_attack, boss_remain, spell_card) is False):
                 continue
 
-            # ラストスペルのときステージクリアの瞬間をキャプチャするため一時的に処理間隔を0.5秒に変更
-            is_last_spell = check_is_last_spell(spell_card)
-            if (is_last_spell):
-                sleep_second = 0.5
+            # ラストスペルのときステージクリアの瞬間をキャプチャするため一時的に処理間隔を短くする
+            if (capture_period > SLEEP_SECOND_TURBO):
+                is_last_spell = check_is_last_spell(spell_card)
+                if (is_last_spell):
+                    sleep_second = SLEEP_SECOND_TURBO
 
             # ステージクリアについてテンプレートマッチング
             is_stage_clear = analyze_stage_clear(original_frame, work_frame)
             if (is_stage_clear):
-                sleep_second = SLEEP_SECOND
+                sleep_second = capture_period
 
             # ステージクリア判定
             current_position = convert_stage_clear(is_stage_clear)
@@ -105,6 +111,9 @@ def main(development, output):
 
             # 結果を格納
             results.append([difficulty, score, remain, graze, boss_name, boss_remain, spell_card, current_position])
+
+            if (print_exec_time):
+                print("1回あたりの実行時間: {0}".format(time.time() - start_time))
 
     except pywintypes.error:
         print(colored("\n\n東方地霊殿が終了したのでプログラムも終了します", "green"))

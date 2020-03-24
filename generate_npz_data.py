@@ -38,21 +38,24 @@ DIFFICULTY_HASHMAP = {
 
 # スコアのサンプルデータ(0～9)
 BINARY_NUMBERS = []
-for index in range(10):
+number_len = len(glob.glob(SAMPLE_NUMBERS_DIR + '*.png'))
+for index in range(number_len):
     img = cv2.imread(SAMPLE_NUMBERS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
     BINARY_NUMBERS.append(img)
 
 
 # 残機のサンプルデータ(1、1/5、2/5、3/5、4/5)
 BINARY_REMAINS = []
-for index in range(5):
+remain_len = len(glob.glob(SAMPLE_REMAINS_DIR + '*.png'))
+for index in range(remain_len):
     img = cv2.imread(SAMPLE_REMAINS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
     BINARY_REMAINS.append(img)
 
 
 # 難易度のサンプルデータ(Easy～Extra)
 BINARY_DIFFICULTIES = []
-for index in range(5):
+difficulty_len = len(glob.glob(SAMPLE_DIFFICULTIES_DIR + '*.png'))
+for index in range(difficulty_len):
     img = cv2.imread(SAMPLE_DIFFICULTIES_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
     BINARY_DIFFICULTIES.append(img)
 
@@ -60,7 +63,8 @@ for index in range(5):
 # ボス名のサンプルデータ(キスメ～古明地こいし)
 # ボス名は単色なのでinRangeで色を指定して二値化してから使用する
 BINARY_BOSS_NAMES = []
-for index in range(9):
+boss_name_len = len(glob.glob(SAMPLE_BOSS_NAMES_DIR + '*.png'))
+for index in range(boss_name_len):
     img = cv2.imread(SAMPLE_BOSS_NAMES_DIR + str(index) + '.png')
     img = cv2.inRange(img, (255, 255, 119), (255, 255, 119))
     BINARY_BOSS_NAMES.append(img)
@@ -96,21 +100,24 @@ img = cv2.inRange(img, (0, 0, 136), (0, 0, 255))
 # cv2.imwrite(OUTPUT_DIR + 'stage_clear0.png', img)
 BINARY_STAGE_CLEARS.append(img)
 # 0.pngの二値化のマッチングがうまく行かなかったとき用に通常のグレースケールの画像についてもマッチングを実施する
-for index in range(6):
+stage_clear_len = len(glob.glob(SAMPLE_STAGE_CLEARS_DIR + '*.png'))
+for index in range(stage_clear_len):
     img = cv2.imread(SAMPLE_STAGE_CLEARS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
     BINARY_STAGE_CLEARS.append(img)
 
 
 # エネミーアイコンのサンプルデータ
 BINARY_ENEMY_ICONS = []
-for index in range(2):
+enemy_icon_len = len(glob.glob(SAMPLE_ENEMY_ICONS_DIR + '*.png'))
+for index in range(enemy_icon_len):
     img = cv2.imread(SAMPLE_ENEMY_ICONS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
     BINARY_ENEMY_ICONS.append(img)
 
 
 # 残り時間のサンプルデータ
 BINARY_TIME_REMAINS = []
-for index in range(10):
+time_remain_len = len(glob.glob(SAMPLE_TIME_REMAINS_DIR + '*.png'))
+for index in range(time_remain_len):
     img = cv2.imread(SAMPLE_TIME_REMAINS_DIR + str(index) + '.png', cv2.IMREAD_GRAYSCALE) #グレースケールで読み込み
     BINARY_TIME_REMAINS.append(img)
 

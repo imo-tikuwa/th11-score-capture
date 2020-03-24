@@ -14,7 +14,7 @@ from builtins import enumerate
 colorama.init()
 # 設定ファイルを利用する
 import configparser
-# スペルカードディレクトリ内の特定のファイル数をカウントするのに利用
+# スペルカード、ステージクリアディレクトリ内の特定のファイル数をカウントするのに利用
 import glob
 # CSV出力
 import csv
@@ -39,7 +39,7 @@ SAMPLE_TIME_REMAINS_DIR = SAMPLE_DIR + 'time_remain' + os.sep
 NPZ_FILE = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'npz_data' + os.sep + 'bundle.npz'
 TH11_WINDOW_ALLOW_WIDTH = 1280
 TH11_WINDOW_ALLOW_HEIGHT = 960
-SLEEP_SECOND = 1
+SLEEP_SECOND_TURBO = 0.5
 STAGE_CLEAR_TXT = 'STAGE CLEAR'
 DIFFICULTY_EASY = 0
 DIFFICULTY_NORMAL = 1
@@ -838,6 +838,9 @@ LAST_SPELL_CARDS = {}
 # ステージクリアのROI
 STAGE_CLEAR_ROI = (227, 212, 673, 272)
 
+# ステージクリアのサンプルデータ数(rangeで使うので+1)
+STAGE_CLEAR_SAMPLE_RANGE = len(glob.glob(SAMPLE_STAGE_CLEARS_DIR + '*.png')) + 1
+
 # ENEMYアイコンのROI
 ENEMY_ICON_ROI = (64, 930, 831, 955)
 
@@ -1191,7 +1194,7 @@ def analyze_stage_clear(original_frame, work_frame):
     if (max_val > 0.98):
         return True
 
-    for num in range(1,7):
+    for num in range(1, STAGE_CLEAR_SAMPLE_RANGE):
         # グレースケール化されたフレームでテンプレートマッチング
         clopped_frame = work_frame[STAGE_CLEAR_ROI[1]:STAGE_CLEAR_ROI[3], STAGE_CLEAR_ROI[0]:STAGE_CLEAR_ROI[2]]
 
