@@ -19,10 +19,24 @@ pip install -r requirements.txt
 python app.rb
 ```
 
-## メモ
-スペルカードについてPhotoshopで切り抜きとかした後、そのままでは画像がうまく読み込めない模様。  
-「libpng warning: iCCP: known incorrect sRGB profile」  というエラーが出てた。  
-ImageMagickでexif情報を削除するバッチ(sh\strip_sample_spell_cards.bat)を実行する必要あり。
+## オプション
+| オプション名 | 内容 |
+|---|---|
+| -dev, --development | 開発モード(outputディレクトリに解析に使用した画像を保存) |
+| --output | 指定したときコンソールに暫定の解析結果の出力を行います |
+| --capture-period | 画面のキャプチャ間隔を指定してください(秒)、最低0～最大10.0 |
+| --print-exec-time | 1回あたりのテンプレートマッチング処理全体の処理時間を出力します |
+
+## 使い方
+1. プログラムを実行する
+```
+python app.rb --output --capture-period 0.3
+```
+
+2.  (初回のみ)th11.exeの場所を指定する
+3. プレイ画面を認識すると自動でスコア等のキャプチャおよび解析が開始します
+4. 解析を終了したくなったところでCtrl+Cでプログラムの処理を中断
+5. プログラムが終了します。解析した結果はoutputディレクトリに日付文字列付きのCSVファイルとして出力されます
 
 ## サンプルデータについて
 sample_data以下のファイルを更新した場合はnpzファイルを更新する必要がある。  
