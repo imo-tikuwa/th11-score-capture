@@ -881,7 +881,7 @@ BINARY_TIME_REMAINS = NPZ_DATA['time_remain']
 
 def print_usage():
     about = '-' * 80 + '\n'
-    about += '|{:^78}|\n'.format('th11 realtime capture')
+    about += '|{:^78}|\n'.format('th11 score capture')
     about += '-' * 80 + '\n'
     about += '|{:^75}|\n'.format('使い方')
     about += '|' + (' ' * 78) +'|\n'
