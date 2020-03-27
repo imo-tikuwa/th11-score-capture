@@ -1692,7 +1692,6 @@ def output_csv(results):
         if (current[CSV_INDEX_DIFFICULTY] is not None and current[CSV_INDEX_SPELL_CARD] is not None):
             try:
                 current_stage = CURRENT_STAGE_DICTIONARY[current[CSV_INDEX_DIFFICULTY]][current[CSV_INDEX_SPELL_CARD]]
-                print(current_stage)
             except KeyError:
                 pass
 #                 print(current[CSV_INDEX_DIFFICULTY])
