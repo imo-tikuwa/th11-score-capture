@@ -12,9 +12,11 @@ CSVファイルで出力するプログラムです。
 | pip | 19.2.3 |
 
 ## インストール、起動
+venvを利用
 ```
 git clone https://github.com/imo-tikuwa/th11-score-capture
 cd th11-score-capture
+.\venv\Scripts\activate.bat
 pip install -r requirements.txt
 python app.rb
 ```
