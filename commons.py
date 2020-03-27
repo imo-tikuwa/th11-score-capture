@@ -25,8 +25,8 @@ import copy
 TH11_WINDOW_NAME = '東方地霊殿　～ Subterranean Animism. ver 1.00a'
 CONFIG_FILE_NAME = 'settings.ini'
 CONFIG_SECTION_NAME = 'config'
-OUTPUT_DIR = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'output' + os.sep
-SAMPLE_DIR = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'sample_data' + os.sep
+OUTPUT_DIR = 'output' + os.sep
+SAMPLE_DIR = 'sample_data' + os.sep
 SAMPLE_NUMBERS_DIR = SAMPLE_DIR + 'number' + os.sep
 SAMPLE_REMAINS_DIR = SAMPLE_DIR + 'remain' + os.sep
 SAMPLE_DIFFICULTIES_DIR = SAMPLE_DIR + 'difficulty' + os.sep
@@ -36,7 +36,7 @@ SAMPLE_SPELL_CARDS_DIR = SAMPLE_DIR + 'spell_card' + os.sep
 SAMPLE_STAGE_CLEARS_DIR = SAMPLE_DIR + 'stage_clear' + os.sep
 SAMPLE_ENEMY_ICONS_DIR = SAMPLE_DIR + 'enemy_icon' + os.sep
 SAMPLE_TIME_REMAINS_DIR = SAMPLE_DIR + 'time_remain' + os.sep
-NPZ_FILE = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'npz_data' + os.sep + 'bundle.npz'
+NPZ_FILE = 'bundle.npz'
 TH11_WINDOW_ALLOW_WIDTH = 1280
 TH11_WINDOW_ALLOW_HEIGHT = 960
 SLEEP_SECOND_TURBO = 0.5
@@ -88,30 +88,6 @@ BOSS_NAME_HASHMAP = {
                       BOSS_UTSUHO: BOSS_UTSUHO_NAME,
                       BOSS_SANAE: BOSS_SANAE_NAME,
                       BOSS_KOISHI: BOSS_KOISHI_NAME
-}
-BOSSNAME2STAGE_HASHMAP = {
-                          None: '',
-                          BOSS_KISUME: '1面',
-                          BOSS_YAMAME: '1面',
-                          BOSS_PARSEE: '2面',
-                          BOSS_YUGI: '3面',
-                          BOSS_SATORI: '4面',
-                          BOSS_ORIN: '5面',
-                          BOSS_UTSUHO: '6面',
-                          BOSS_SANAE: 'EX面',
-                          BOSS_KOISHI: 'EX面',
-}
-BOSS_SHORT_NAME_HASHMAP = {
-                      None: '',
-                      BOSS_KISUME: 'kisume',
-                      BOSS_YAMAME: 'yamame',
-                      BOSS_PARSEE: 'parsee',
-                      BOSS_YUGI: 'yugi',
-                      BOSS_SATORI: 'satori',
-                      BOSS_ORIN: 'orin',
-                      BOSS_UTSUHO: 'utsuho',
-                      BOSS_SANAE: 'sanae',
-                      BOSS_KOISHI: 'koishi'
 }
 SPELL_CARD_NAME_DICTIONARY = {
                            None: '',

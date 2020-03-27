@@ -29,7 +29,10 @@ def main(development, output, capture_period, print_exec_time):
 
         # ウィンドウサイズチェック
         rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
-        if (rect_right - rect_left < TH11_WINDOW_ALLOW_WIDTH or rect_bottom - rect_top < TH11_WINDOW_ALLOW_HEIGHT):
+        if (rect_left < 0 or rect_top < 0 or rect_right < 0 or rect_bottom < 0):
+            print(colored("東方地霊殿のウィンドウが最小化されていて取得できませんでした", "red", attrs=['bold']))
+            exit(0)
+        elif (rect_right - rect_left < TH11_WINDOW_ALLOW_WIDTH or rect_bottom - rect_top < TH11_WINDOW_ALLOW_HEIGHT):
             print(colored("東方地霊殿は1280x960のウィンドウサイズで起動してください", "red", attrs=['bold']))
             exit(0)
 
