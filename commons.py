@@ -1697,7 +1697,8 @@ def output_csv(results):
 #                 print(current[CSV_INDEX_DIFFICULTY])
 #                 print(current[CSV_INDEX_SPELL_CARD])
 
-        # ボス名と現在値が空のデータは道中という判定見なす。ステージ番号がNoneでないときは"道中"の前にステージ番号を記載する
+        # ボス名と現在値が空のデータは道中と見なす
+        # ステージ番号がNoneでないときは"道中"の前にステージ番号を記載する
         if (len(current[CSV_INDEX_BOSS_NAME]) == 0 and len(current[CSV_INDEX_CURRENT_POSITION]) == 0):
             squeezed_results[current_index][CSV_INDEX_CURRENT_POSITION] = (str(current_stage) + '面道中') if (current_stage is not None and current_stage > 0) else ('道中')
 
