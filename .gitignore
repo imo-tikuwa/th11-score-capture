@@ -5,3 +5,7 @@
 /output/*.png
 /output/*.csv
 /memo.txt
+
+# pyinstaller
+/build/
+/dist/

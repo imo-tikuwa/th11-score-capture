@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 import os
 import click
 import time
@@ -31,10 +32,16 @@ def main(development, output, capture_period, print_exec_time):
         rect_left, rect_top, rect_right, rect_bottom = win32gui.GetWindowRect(th11_handle)
         if (rect_left < 0 or rect_top < 0 or rect_right < 0 or rect_bottom < 0):
             print(colored("東方地霊殿のウィンドウが最小化されていて取得できませんでした", "red", attrs=['bold']))
-            exit(0)
+            time.sleep(3)
+            sys.exit(1)
         elif (rect_right - rect_left < TH11_WINDOW_ALLOW_WIDTH or rect_bottom - rect_top < TH11_WINDOW_ALLOW_HEIGHT):
             print(colored("東方地霊殿は1280x960のウィンドウサイズで起動してください", "red", attrs=['bold']))
-            exit(0)
+            time.sleep(3)
+            sys.exit(1)
+
+        # カレントにoutputディレクトリがなければ作成
+        if not os.path.exists(OUTPUT_DIR_NAME):
+            os.mkdir(OUTPUT_DIR_NAME)
 
         # capture関数自体を丸ごと呼びなおしてスペルカードのサンプルデータなんかロードも全てやり直す
         while (True):
@@ -44,13 +51,14 @@ def main(development, output, capture_period, print_exec_time):
                 print("\n続けてキャプチャする場合は c と\n終了する場合はそれ以外のキーを入力してください。")
                 cmd = input("入力：")
                 if cmd != "c":
-                    exit(0)
+                    sys.exit(0)
             else:
                 # CSVを出力せずに抜けてきた場合はこのままプログラム自体を終了する
-                exit(0)
+                time.sleep(3)
+                sys.exit(0)
 
     except KeyboardInterrupt:
-        exit(0)
+        sys.exit(1)
 
 
 def capture(th11_handle, development, output, capture_period, print_exec_time):

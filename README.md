@@ -12,11 +12,54 @@ CSVファイルで出力するプログラムです。
 | pip | 19.2.3 |
 
 ## インストール、起動
+初回
 ```
 git clone https://github.com/imo-tikuwa/th11-score-capture
 cd th11-score-capture
+.\venv\Scripts\activate.bat
 pip install -r requirements.txt
 python app.rb
+```
+
+---
+2回目以降
+```
+cd th11-score-capture
+.\venv\Scripts\activate.bat
+python app.rb
+```
+
+---
+venvを終了するときは以下
+```
+deactivate
+```
+
+## 実行ファイル化(備忘録)
+初回
+```
+cd th11-score-capture
+.\venv\Scripts\activate.bat
+pyinstaller app.py --onefile
+```
+
+---
+生成されたapp.spec修正
+```
+pyz = PYZ(a.pure, a.zipped_data,
+             cipher=block_cipher)
+exe = EXE(pyz,
++          Tree('resources',prefix='resources'),
+          a.scripts,
+          a.binaries,
+```
+
+---
+2回目以降
+```
+cd th11-score-capture
+.\venv\Scripts\activate.bat
+pyinstaller app.spec
 ```
 
 ## オプション
@@ -40,7 +83,7 @@ python app.rb --output --capture-period 0.3
 
 ## サンプルデータについて
 sample_data以下のファイルを更新した場合はnpzファイルを更新する必要がある。  
-具体的には直下にあるgenerate_npz_data.pyを実行するだけ。  
+具体的にはプロジェクト直下にあるgenerate_npz_data.pyを実行するだけ。  
 ※サンプルデータのファイル自体を追加とかする場合はgenerate_npz_data.pyのrangeとかメンテナンスする必要あり。
 
 ## 履歴
@@ -51,3 +94,7 @@ sample_data以下のファイルを更新した場合はnpzファイルを更新
 2020/03/23  
 サンプルデータについてnpz化  
 サンプルデータ周りは少し綺麗になったが他の部分はさらにコードが汚くなった
+
+2020/03/28  
+venvとpyinstaller導入  
+実行ファイルを生成可能な形にプログラムを少し修正
