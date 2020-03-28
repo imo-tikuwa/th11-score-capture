@@ -1113,12 +1113,12 @@ def execute_th11(config):
             root = tkinter.Tk()
             root.withdraw()
 
-            file_type = [("東方地霊殿の実行ファイル", "th11.exe"),("全てのファイル", "*.*")]
-            initial_dir = os.path.abspath(os.path.dirname(__file__))
-            th11_exe_file = tkinter.filedialog.askopenfilename(filetypes=file_type, initialdir=initial_dir)
+            file_type = [("東方地霊殿の実行ファイル", "th11.exe")]
+            initial_dir = os.getcwd()
+            th11_exe_file = tkinter.filedialog.askopenfilename(filetypes = file_type, initialdir = os.getcwd())
 
             if th11_exe_file == "" or os.path.basename(th11_exe_file) != 'th11.exe':
-                print(colored("東方地霊殿の実行ファイルを指定してください。", "red", attrs=['bold']))
+                print(colored("東方地霊殿の実行ファイルが見つからないため終了します。", "red", attrs=['bold']))
                 time.sleep(3)
                 sys.exit(1)
 
@@ -1138,12 +1138,19 @@ def execute_th11(config):
         time.sleep(5)
 
         # ウィンドウ名でハンドル取得
+        error_count = 0
         while(True):
             th11_handle = win32gui.FindWindow(None, TH11_WINDOW_NAME)
             if th11_handle > 0:
                 break
 
-            print(colored("東方地霊殿が起動してないよー", "red", attrs=['bold']))
+            error_count += 1
+            if (error_count > 3):
+                print(colored("東方地霊殿が起動してないため終了します。", "red", attrs=['bold']))
+                time.sleep(3)
+                sys.exit(1)
+
+            print(colored("東方地霊殿が起動していません。", "red", attrs=['bold']))
             time.sleep(3)
 
     return th11_handle
