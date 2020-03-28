@@ -1106,6 +1106,9 @@ def execute_th11(config):
 
         # ダイアログを開いて地霊殿の実行ファイルを指定してもらう
         if th11_exe_file == "":
+
+            print(colored("東方地霊殿の実行ファイルを指定してください。", "green", attrs=['bold']))
+
             # th11.exe指定
             root = tkinter.Tk()
             root.withdraw()
