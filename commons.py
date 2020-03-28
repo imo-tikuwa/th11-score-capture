@@ -1,4 +1,5 @@
 import numpy
+import sys
 import os
 import time
 import cv2
@@ -21,11 +22,19 @@ import csv
 import copy
 
 
+def resource_path(filename):
+    # exeファイル化に伴うリソースパスの動的な切り替えを行う関数
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, filename)
+    return os.path.join(filename)
+
+
 # 変数(定数扱いする変数)
 TH11_WINDOW_NAME = '東方地霊殿　～ Subterranean Animism. ver 1.00a'
 CONFIG_FILE_NAME = 'settings.ini'
 CONFIG_SECTION_NAME = 'config'
-OUTPUT_DIR = 'output' + os.sep
+OUTPUT_DIR_NAME = 'output'
+OUTPUT_DIR = OUTPUT_DIR_NAME + os.sep
 SAMPLE_DIR = 'sample_data' + os.sep
 SAMPLE_NUMBERS_DIR = SAMPLE_DIR + 'number' + os.sep
 SAMPLE_REMAINS_DIR = SAMPLE_DIR + 'remain' + os.sep
@@ -36,7 +45,7 @@ SAMPLE_SPELL_CARDS_DIR = SAMPLE_DIR + 'spell_card' + os.sep
 SAMPLE_STAGE_CLEARS_DIR = SAMPLE_DIR + 'stage_clear' + os.sep
 SAMPLE_ENEMY_ICONS_DIR = SAMPLE_DIR + 'enemy_icon' + os.sep
 SAMPLE_TIME_REMAINS_DIR = SAMPLE_DIR + 'time_remain' + os.sep
-NPZ_FILE = 'bundle.npz'
+NPZ_FILE =  'resources' + os.sep + 'bundle.npz'
 TH11_WINDOW_ALLOW_WIDTH = 1280
 TH11_WINDOW_ALLOW_HEIGHT = 960
 SLEEP_SECOND_TURBO = 0.5
@@ -1028,7 +1037,7 @@ TIME_REMAIN_ROI = (808, 44, 820, 64)
 
 
 # generate_npz_data.pyによって生成されたデータを読み込み
-NPZ_DATA = numpy.load(NPZ_FILE, allow_pickle = True)
+NPZ_DATA = numpy.load(resource_path(NPZ_FILE), allow_pickle = True)
 
 # スコアのサンプルデータ(0～9)
 BINARY_NUMBERS = NPZ_DATA['number']
@@ -1107,6 +1116,7 @@ def execute_th11(config):
 
             if th11_exe_file == "" or os.path.basename(th11_exe_file) != 'th11.exe':
                 print(colored("東方地霊殿の実行ファイルを指定してください。", "red", attrs=['bold']))
+                time.sleep(3)
                 sys.exit(1)
 
             # 設定ファイルにexeファイルのパス保存

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 import os
 import click
 import time
@@ -66,7 +67,7 @@ def main(development):
 
     except KeyboardInterrupt:
         print(colored("プログラムを終了します", "green"))
-        exit(0)
+        sys.exit(0)
 
 if __name__ == '__main__':
     main()
