@@ -14,10 +14,11 @@ from commons import *
 
 @click.command()
 @click.option('--development', '-dev', is_flag = True, help = "開発モード(outputディレクトリに解析に使用した画像を保存)")
+@click.option('--output-all-result-csv', is_flag = True, help = "全テンプレートマッチングの結果データを記録したCSVを出力")
 @click.option('--output', is_flag = True, help = "指定したときコンソールに暫定の解析結果の出力を行います")
 @click.option('--capture-period', default = 1.0, type = click.FloatRange(0.0, 10.0), help = "画面のキャプチャ間隔(秒)")
 @click.option('--print-exec-time', is_flag = True, help = "テンプレートマッチング処理全体の処理時間を出力します。この数値を見てcapture-periodを設定するのを推奨")
-def main(development, output, capture_period, print_exec_time):
+def main(development, output_all_result_csv, output, capture_period, print_exec_time):
 
     print_usage()
     try:
@@ -45,7 +46,7 @@ def main(development, output, capture_period, print_exec_time):
 
         # capture関数自体を丸ごと呼びなおしてスペルカードのサンプルデータなんかロードも全てやり直す
         while (True):
-            csv_save = capture(th11_handle, development, output, capture_period, print_exec_time)
+            csv_save = capture(th11_handle, development, output_all_result_csv, output, capture_period, print_exec_time)
             if (csv_save):
                 time.sleep(2)
                 print("\n続けてキャプチャする場合は c と\n終了する場合はそれ以外のキーを入力してください。")
@@ -61,7 +62,7 @@ def main(development, output, capture_period, print_exec_time):
         sys.exit(1)
 
 
-def capture(th11_handle, development, output, capture_period, print_exec_time):
+def capture(th11_handle, development, output_all_result_csv, output, capture_period, print_exec_time):
     # キャプチャ処理
     # CSVを保存したらTrue、しなかったらFalseを返す
 
@@ -157,12 +158,12 @@ def capture(th11_handle, development, output, capture_period, print_exec_time):
     except pywintypes.error:
         print(colored("\n\n東方地霊殿が終了したのでプログラムも終了します", "green", attrs=['bold']))
         if (len(results) > 0):
-            output_csv(results, development)
+            output_csv(results, output_all_result_csv)
 
     except KeyboardInterrupt:
         print(colored("\n\nキャプチャを終了します", "green", attrs=['bold']))
         if (len(results) > 0):
-            output_csv(results, development)
+            output_csv(results, output_all_result_csv)
             return True
 
     return False

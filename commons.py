@@ -11,7 +11,6 @@ import tkinter, tkinter.filedialog, tkinter.messagebox
 # print出力に色付ける
 from termcolor import colored
 import colorama
-from builtins import enumerate
 colorama.init()
 # 設定ファイルを利用する
 import configparser
@@ -1609,12 +1608,12 @@ def inconsistency_check(output, difficulty, boss_name, is_boss_attack, boss_rema
     return True
 
 
-def output_csv(results, development):
+def output_csv(results, output_all_result_csv):
     # CSV出力処理
 
     # 重複を含めたすべてのデータをCSV出力
     save_datetime = datetime.now().strftime('%Y%m%d%H%M%S')
-    if (development):
+    if (output_all_result_csv):
         all_results = append_current_position(results)
         all_result_csv = save_datetime + '_all_result.csv'
         save_csv(all_result_csv, all_results)
@@ -1677,6 +1676,7 @@ def output_csv(results, development):
     # データ配列に現在地を付与する
     squeezed_results = append_current_position(squeezed_results)
 
+
     # CSVデータの補正処理2
     # 再度重複をチェックしなおす
     # (「ニュークリアエクスカーション」⇒「霊烏路空通常1」⇒「ニュークリアエクスカーション」...のような)マッチングとなってしまった時の重複を削除する
@@ -1696,12 +1696,9 @@ def output_csv(results, development):
             del squeezed_results[current_index]
             continue
 
+
     # CSVデータの補正処理3
     # 補正処理2の後にボス名が存在し、現在地が空のデータはゴミと見なして削除する
-    # また、ボス名と現在値が空のデータは道中と見なす
-    current_stage = None
-    is_mid_boss = None
-    current_dotyu_suffix = '後半' # 後ろからループするのでとりあえず"後半"を初期値とする
     for current_index in reversed(range(len(squeezed_results))):
         current = squeezed_results[current_index]
 
@@ -1709,6 +1706,15 @@ def output_csv(results, development):
         if (len(current[CSV_INDEX_BOSS_NAME]) > 0 and len(current[CSV_INDEX_CURRENT_POSITION]) == 0):
             del squeezed_results[current_index]
             continue
+
+
+    # CSVデータの補正処理4
+    # ボス名と現在値が空のデータは道中と見なして現在地を埋める
+    current_stage = None
+    is_mid_boss = None
+    current_dotyu_suffix = '後半' # 後ろからループするのでとりあえず"後半"を初期値とする
+    for current_index in reversed(range(len(squeezed_results))):
+        current = squeezed_results[current_index]
 
         # 難易度とスペルカードから現在のステージ番号を取得
         if (current[CSV_INDEX_DIFFICULTY] is not None and current[CSV_INDEX_SPELL_CARD] is not None):
@@ -1725,18 +1731,94 @@ def output_csv(results, development):
                 pass
 #                 print(current[CSV_INDEX_DIFFICULTY])
 #                 print(current[CSV_INDEX_SPELL_CARD])
-
         # ボス名と現在値が空のデータは道中と見なす
         # ステージ番号がNoneでないときは"道中"の前にステージ番号を記載する
         if (len(current[CSV_INDEX_BOSS_NAME]) == 0 and len(current[CSV_INDEX_CURRENT_POSITION]) == 0):
             dotyu_text = (str(current_stage) + '面道中' + current_dotyu_suffix) if (current_stage is not None) else ('道中' + current_dotyu_suffix)
             squeezed_results[current_index][CSV_INDEX_CURRENT_POSITION] = dotyu_text
 
+
+    # CSVデータの補正処理5
+    # 現在のプログラムではTIME_TABLESという辞書の都合で2面の中ボス通常について
+    #「水橋パルスィ通常2」という現在地を埋めるようになってしまってる（他にもある）
+    # これを修正する
+    # 正直、プログラムでここまでやらなくてもいいような気もする
+    for current_index in reversed(range(len(squeezed_results))):
+        # current_numのレコードを中心に前、現在の2レコードを取得
+        current = squeezed_results[current_index]
+        prev = None
+        if (current_index > 0):
+            prev = squeezed_results[current_index - 1]
+
+        # currentの現在地が「水橋パルスィ通常2」とprevの現在地が「2面道中前半」のときcurrentを削除
+        # スペルカード名が取れない&ボス名が取れたというケースでできてしまう模様
+        if (prev is not None
+            and current[CSV_INDEX_CURRENT_POSITION] == '水橋パルスィ通常2'
+            and prev[CSV_INDEX_CURRENT_POSITION] == '2面道中前半'
+            ):
+            del squeezed_results[current_index]
+            continue
+
+        # currentの現在地が「星熊勇儀通常3」とprevの現在地が「3面道中前半」のときcurrentを削除
+        # スペルカード名が取れない&ボス名が取れたというケースでできてしまう模様
+        if (prev is not None
+            and current[CSV_INDEX_CURRENT_POSITION] == '星熊勇儀通常3'
+            and prev[CSV_INDEX_CURRENT_POSITION] == '3面道中前半'
+            ):
+            del squeezed_results[current_index]
+            continue
+
+        # currentの現在地が「古明地さとり通常1」とprevの現在地が「4面道中」のときcurrentの現在地修正
+        # 4面は中ボスがマッチングできないことによる対応^q^
+        if (prev is not None
+            and current[CSV_INDEX_CURRENT_POSITION] == '古明地さとり通常1'
+            and prev[CSV_INDEX_CURRENT_POSITION] == '4面道中後半'
+            ):
+            squeezed_results[current_index][CSV_INDEX_CURRENT_POSITION] == '4面道中'
+            continue
+
+    # CSVデータの補正処理6
+    # STAGE CLEARに面情報を付加する
+    # 次項の補正処理7で現在地が一致するデータについて削除するようにしたのでステージクリアの現在地に面情報を追加する必要が出てきた
+    current_stage = None
+    for current_index, current in enumerate(squeezed_results):
+        # 難易度とスペルカードから現在のステージ番号を取得
+        if (current[CSV_INDEX_DIFFICULTY] is not None and current[CSV_INDEX_SPELL_CARD] is not None):
+            try:
+                current_stage = CURRENT_STAGE_DICTIONARY[current[CSV_INDEX_DIFFICULTY]][current[CSV_INDEX_SPELL_CARD]]['stage_num']
+            except KeyError:
+                pass
+        # ステージクリアに面情報を付加
+        if (current_stage is not None
+            and current[CSV_INDEX_CURRENT_POSITION] == STAGE_CLEAR_TXT
+            and current_stage != 'EX'
+            ):
+            squeezed_results[current_index][CSV_INDEX_CURRENT_POSITION] = str(current_stage) + '面' + squeezed_results[current_index][CSV_INDEX_CURRENT_POSITION]
+
+
+    # CSVデータの補正処理7
+    # 現在地が重複してるデータを削除する
+    # 先頭から順番に空の配列に現在地を格納し、重複があるときのインデックス番号を控える
+    # 控えたインデックス番号の配列を逆順にし、インデックス値が大きいやつから順番に削除していく
+    # この処理を入れることで、スペルカード→スペルカードみたいな構成のときに余計な通常〇のデータが消せるようになった
+    current_position_array = []
+    del_target_index_array = []
+    for current_index, current in enumerate(squeezed_results):
+        if (current[CSV_INDEX_CURRENT_POSITION] in current_position_array):
+            del_target_index_array.append(current_index)
+            continue
+        current_position_array.append(current[CSV_INDEX_CURRENT_POSITION])
+#     print(del_target_index_array)
+    for del_index in reversed(del_target_index_array):
+#         print(squeezed_results[del_index])
+        del squeezed_results[del_index]
+
+
     # 重複を除外したデータをCSV出力
     squeezed_result_csv = save_datetime + '_result.csv'
     save_csv(squeezed_result_csv, squeezed_results)
 
-    if (development):
+    if (output_all_result_csv):
         print(colored("\n結果を以下のCSVに出力しました。\n全てのキャプチャ結果：{0}\n重複を除いたキャプチャ結果：{1}".format(all_result_csv, squeezed_result_csv), "green", attrs=['bold']))
     else:
         print(colored("\n結果を以下のCSVに出力しました。\nファイル名：{0}".format(squeezed_result_csv), "green", attrs=['bold']))
