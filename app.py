@@ -157,12 +157,12 @@ def capture(th11_handle, development, output, capture_period, print_exec_time):
     except pywintypes.error:
         print(colored("\n\n東方地霊殿が終了したのでプログラムも終了します", "green", attrs=['bold']))
         if (len(results) > 0):
-            output_csv(results)
+            output_csv(results, development)
 
     except KeyboardInterrupt:
         print(colored("\n\nキャプチャを終了します", "green", attrs=['bold']))
         if (len(results) > 0):
-            output_csv(results)
+            output_csv(results, development)
             return True
 
     return False

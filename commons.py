@@ -460,201 +460,218 @@ TIME_TABLES = {
                                    },
 }
 # 現在のステージ番号を取得するためのマップ（Easy～Lunatic）
+# 辞書を1段階深くして、ステージ番号の他に、中ボスのスペルカードかどうかのフラグを持たせる
+# 中ボスのスペルカード可否はresult.csvの道中の前半と後半の判定に使用する
 CURRENT_STAGE_DICTIONARY = {
                             None: '',
                             DIFFICULTY_EASY_VALUE:    {
                                                        # stage1
-                                                       '罠符「キャプチャーウェブ」': 1,
-                                                       '瘴符「フィルドミアズマ」': 1,
+                                                       '罠符「キャプチャーウェブ」': {'stage_num': 1, 'is_mid_boss': False},
+                                                       '瘴符「フィルドミアズマ」': {'stage_num': 1, 'is_mid_boss': False},
                                                        # stage2
-                                                       '妬符「グリーンアイドモンスター」': 2,
-                                                       '花咲爺「華やかなる仁者への嫉妬」': 2,
-                                                       '舌切雀「謙虚なる富者への片恨」': 2,
-                                                       '恨符「丑の刻参り」': 2,
+                                                       '妬符「グリーンアイドモンスター」': {'stage_num': 2, 'is_mid_boss': True},
+                                                       '花咲爺「華やかなる仁者への嫉妬」': {'stage_num': 2, 'is_mid_boss': False},
+                                                       '舌切雀「謙虚なる富者への片恨」': {'stage_num': 2, 'is_mid_boss': False},
+                                                       '恨符「丑の刻参り」': {'stage_num': 2, 'is_mid_boss': False},
                                                        # stage3
-                                                       '鬼符「怪力乱神」': 3,
-                                                       '怪輪「地獄の苦輪」': 3,
-                                                       '力業「大江山嵐」': 3,
-                                                       '四天王奥義「三歩必殺」': 3,
+                                                       '鬼符「怪力乱神」': {'stage_num': 3, 'is_mid_boss': True},
+                                                       '怪輪「地獄の苦輪」': {'stage_num': 3, 'is_mid_boss': False},
+                                                       '力業「大江山嵐」': {'stage_num': 3, 'is_mid_boss': False},
+                                                       '四天王奥義「三歩必殺」': {'stage_num': 3, 'is_mid_boss': False},
                                                        # stage4
-                                                       '想起「テリブルスーヴニール」': 4,
-                                                       '想起「二重黒死蝶」': 4,             # 霊夢A
-                                                       '想起「戸隠山投げ」': 4,             # 霊夢B
-                                                       '想起「風神木の葉隠れ」': 4,         # 霊夢C
-                                                       '想起「春の京人形」': 4,             # 魔理沙A
-                                                       '想起「マーキュリポイズン」': 4,     # 魔理沙B
-                                                       '想起「のびーるアーム」': 4,         # 魔理沙C
-                                                       '想起「飛行虫ネスト」': 4,           # 霊夢A
-                                                       '想起「百万鬼夜行」': 4,             # 霊夢B
-                                                       '想起「天狗のマクロバースト」': 4,   # 霊夢C
-                                                       '想起「ストロードールカミカゼ」': 4, # 魔理沙A
-                                                       '想起「プリンセスウンディネ」': 4,   # 魔理沙B
-                                                       '想起「河童のポロロッカ」': 4,       # 魔理沙C
-                                                       '想起「波と粒の境界」': 4,           # 霊夢A
-                                                       '想起「濛々迷霧」': 4,               # 霊夢B
-                                                       '想起「鳥居つむじ風」': 4,           # 霊夢C
-                                                       '想起「リターンイナニメトネス」': 4, # 魔理沙A
-                                                       '想起「賢者の石」': 4,               # 魔理沙B
-                                                       '想起「光り輝く水底のトラウマ」': 4, # 魔理沙C
+                                                       '想起「テリブルスーヴニール」': {'stage_num': 4, 'is_mid_boss': False},
+                                                       '想起「二重黒死蝶」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢A
+                                                       '想起「戸隠山投げ」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢B
+                                                       '想起「風神木の葉隠れ」': {'stage_num': 4, 'is_mid_boss': False},        # 霊夢C
+                                                       '想起「春の京人形」': {'stage_num': 4, 'is_mid_boss': False},            # 魔理沙A
+                                                       '想起「マーキュリポイズン」': {'stage_num': 4, 'is_mid_boss': False},    # 魔理沙B
+                                                       '想起「のびーるアーム」': {'stage_num': 4, 'is_mid_boss': False},        # 魔理沙C
+                                                       '想起「飛行虫ネスト」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢A
+                                                       '想起「百万鬼夜行」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢B
+                                                       '想起「天狗のマクロバースト」': {'stage_num': 4, 'is_mid_boss': False},  # 霊夢C
+                                                       '想起「ストロードールカミカゼ」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙A
+                                                       '想起「プリンセスウンディネ」': {'stage_num': 4, 'is_mid_boss': False},  # 魔理沙B
+                                                       '想起「河童のポロロッカ」': {'stage_num': 4, 'is_mid_boss': False},      # 魔理沙C
+                                                       '想起「波と粒の境界」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢A
+                                                       '想起「濛々迷霧」': {'stage_num': 4, 'is_mid_boss': False},              # 霊夢B
+                                                       '想起「鳥居つむじ風」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢C
+                                                       '想起「リターンイナニメトネス」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙A
+                                                       '想起「賢者の石」': {'stage_num': 4, 'is_mid_boss': False},              # 魔理沙B
+                                                       '想起「光り輝く水底のトラウマ」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙C
                                                        # stage5
-                                                       '猫符「キャッツウォーク」': 5,
-                                                       '呪精「ゾンビフェアリー」': 5,
-                                                       '恨霊「スプリーンイーター」': 5,
-                                                       '贖罪「旧地獄の針山」': 5,
-                                                       '「死灰復燃」': 5,
+                                                       '猫符「キャッツウォーク」': {'stage_num': 5, 'is_mid_boss': True},
+                                                       '呪精「ゾンビフェアリー」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '恨霊「スプリーンイーター」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '贖罪「旧地獄の針山」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '「死灰復燃」': {'stage_num': 5, 'is_mid_boss': False},
                                                        # stage6
-                                                       '妖怪「火焔の車輪」': 6,
-                                                       '核熱「ニュークリアフュージョン」': 6,
-                                                       '爆符「プチフレア」': 6,
-                                                       '焔星「フィクストスター」': 6,
-                                                       '「地獄極楽メルトダウン」': 6,
-                                                       '「地獄の人工太陽」': 6,
+                                                       '妖怪「火焔の車輪」': {'stage_num': 6, 'is_mid_boss': True},
+                                                       '核熱「ニュークリアフュージョン」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '爆符「プチフレア」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '焔星「フィクストスター」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '「地獄極楽メルトダウン」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '「地獄の人工太陽」': {'stage_num': 6, 'is_mid_boss': False},
                                                        },
                             DIFFICULTY_NORMAL_VALUE:  {
                                                        # stage1
-                                                       '罠符「キャプチャーウェブ」': 1,
-                                                       '瘴符「フィルドミアズマ」': 1,
+                                                       '罠符「キャプチャーウェブ」': {'stage_num': 1, 'is_mid_boss': False},
+                                                       '瘴符「フィルドミアズマ」': {'stage_num': 1, 'is_mid_boss': False},
                                                        # stage2
-                                                       '妬符「グリーンアイドモンスター」': 2,
-                                                       '花咲爺「華やかなる仁者への嫉妬」': 2,
-                                                       '舌切雀「謙虚なる富者への片恨」': 2,
-                                                       '恨符「丑の刻参り」': 2,
+                                                       '妬符「グリーンアイドモンスター」': {'stage_num': 2, 'is_mid_boss': True},
+                                                       '花咲爺「華やかなる仁者への嫉妬」': {'stage_num': 2, 'is_mid_boss': False},
+                                                       '舌切雀「謙虚なる富者への片恨」': {'stage_num': 2, 'is_mid_boss': False},
+                                                       '恨符「丑の刻参り」': {'stage_num': 2, 'is_mid_boss': False},
                                                        # stage3
-                                                       '鬼符「怪力乱神」': 3,
-                                                       '怪輪「地獄の苦輪」': 3,
-                                                       '力業「大江山嵐」': 3,
-                                                       '四天王奥義「三歩必殺」': 3,
+                                                       '鬼符「怪力乱神」': {'stage_num': 3, 'is_mid_boss': True},
+                                                       '怪輪「地獄の苦輪」': {'stage_num': 3, 'is_mid_boss': False},
+                                                       '力業「大江山嵐」': {'stage_num': 3, 'is_mid_boss': False},
+                                                       '四天王奥義「三歩必殺」': {'stage_num': 3, 'is_mid_boss': False},
                                                        # stage4
-                                                       '想起「テリブルスーヴニール」': 4,
-                                                       '想起「二重黒死蝶」': 4,             # 霊夢A
-                                                       '想起「戸隠山投げ」': 4,             # 霊夢B
-                                                       '想起「風神木の葉隠れ」': 4,         # 霊夢C
-                                                       '想起「春の京人形」': 4,             # 魔理沙A
-                                                       '想起「マーキュリポイズン」': 4,     # 魔理沙B
-                                                       '想起「のびーるアーム」': 4,         # 魔理沙C
-                                                       '想起「飛行虫ネスト」': 4,           # 霊夢A
-                                                       '想起「百万鬼夜行」': 4,             # 霊夢B
-                                                       '想起「天狗のマクロバースト」': 4,   # 霊夢C
-                                                       '想起「ストロードールカミカゼ」': 4, # 魔理沙A
-                                                       '想起「プリンセスウンディネ」': 4,   # 魔理沙B
-                                                       '想起「河童のポロロッカ」': 4,       # 魔理沙C
-                                                       '想起「波と粒の境界」': 4,           # 霊夢A
-                                                       '想起「濛々迷霧」': 4,               # 霊夢B
-                                                       '想起「鳥居つむじ風」': 4,           # 霊夢C
-                                                       '想起「リターンイナニメトネス」': 4, # 魔理沙A
-                                                       '想起「賢者の石」': 4,               # 魔理沙B
-                                                       '想起「光り輝く水底のトラウマ」': 4, # 魔理沙C
+                                                       '想起「テリブルスーヴニール」': {'stage_num': 4, 'is_mid_boss': False},
+                                                       '想起「二重黒死蝶」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢A
+                                                       '想起「戸隠山投げ」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢B
+                                                       '想起「風神木の葉隠れ」': {'stage_num': 4, 'is_mid_boss': False},        # 霊夢C
+                                                       '想起「春の京人形」': {'stage_num': 4, 'is_mid_boss': False},            # 魔理沙A
+                                                       '想起「マーキュリポイズン」': {'stage_num': 4, 'is_mid_boss': False},    # 魔理沙B
+                                                       '想起「のびーるアーム」': {'stage_num': 4, 'is_mid_boss': False},        # 魔理沙C
+                                                       '想起「飛行虫ネスト」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢A
+                                                       '想起「百万鬼夜行」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢B
+                                                       '想起「天狗のマクロバースト」': {'stage_num': 4, 'is_mid_boss': False},  # 霊夢C
+                                                       '想起「ストロードールカミカゼ」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙A
+                                                       '想起「プリンセスウンディネ」': {'stage_num': 4, 'is_mid_boss': False},  # 魔理沙B
+                                                       '想起「河童のポロロッカ」': {'stage_num': 4, 'is_mid_boss': False},      # 魔理沙C
+                                                       '想起「波と粒の境界」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢A
+                                                       '想起「濛々迷霧」': {'stage_num': 4, 'is_mid_boss': False},              # 霊夢B
+                                                       '想起「鳥居つむじ風」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢C
+                                                       '想起「リターンイナニメトネス」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙A
+                                                       '想起「賢者の石」': {'stage_num': 4, 'is_mid_boss': False},              # 魔理沙B
+                                                       '想起「光り輝く水底のトラウマ」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙C
                                                        # stage5
-                                                       '猫符「キャッツウォーク」': 5,
-                                                       '呪精「ゾンビフェアリー」': 5,
-                                                       '恨霊「スプリーンイーター」': 5,
-                                                       '贖罪「旧地獄の針山」': 5,
-                                                       '「死灰復燃」': 5,
+                                                       '猫符「キャッツウォーク」': {'stage_num': 5, 'is_mid_boss': True},
+                                                       '呪精「ゾンビフェアリー」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '恨霊「スプリーンイーター」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '贖罪「旧地獄の針山」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '「死灰復燃」': {'stage_num': 5, 'is_mid_boss': False},
                                                        # stage6
-                                                       '妖怪「火焔の車輪」': 6,
-                                                       '核熱「ニュークリアフュージョン」': 6,
-                                                       '爆符「メガフレア」': 6,
-                                                       '焔星「フィクストスター」': 6,
-                                                       '「地獄極楽メルトダウン」': 6,
-                                                       '「地獄の人工太陽」': 6,
+                                                       '妖怪「火焔の車輪」': {'stage_num': 6, 'is_mid_boss': True},
+                                                       '核熱「ニュークリアフュージョン」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '爆符「メガフレア」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '焔星「フィクストスター」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '「地獄極楽メルトダウン」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '「地獄の人工太陽」': {'stage_num': 6, 'is_mid_boss': False},
                                                        },
                             DIFFICULTY_HARD_VALUE:    {
                                                        # stage1
-                                                       '怪奇「釣瓶落としの怪」': 1, # H/L限定
-                                                       '蜘蛛「石窟の蜘蛛の巣」': 1,
-                                                       '瘴気「原因不明の熱病」': 1,
+                                                       '怪奇「釣瓶落としの怪」': {'stage_num': 1, 'is_mid_boss': True}, # H/L限定
+                                                       '蜘蛛「石窟の蜘蛛の巣」': {'stage_num': 1, 'is_mid_boss': False},
+                                                       '瘴気「原因不明の熱病」': {'stage_num': 1, 'is_mid_boss': False},
                                                        # stage2
-                                                       '嫉妬「緑色の目をした見えない怪物」': 2,
-                                                       '花咲爺「シロの灰」': 2,
-                                                       '舌切雀「大きな葛籠と小さな葛籠」': 2,
-                                                       '恨符「丑の刻参り七日目」': 2,
+                                                       '嫉妬「緑色の目をした見えない怪物」': {'stage_num': 2, 'is_mid_boss': True},
+                                                       '花咲爺「シロの灰」': {'stage_num': 2, 'is_mid_boss': False},
+                                                       '舌切雀「大きな葛籠と小さな葛籠」': {'stage_num': 2, 'is_mid_boss': False},
+                                                       '恨符「丑の刻参り七日目」': {'stage_num': 2, 'is_mid_boss': False},
                                                        # stage3
-                                                       '鬼符「怪力乱神」': 3,
-                                                       '枷符「咎人の外さぬ枷」': 3,
-                                                       '力業「大江山颪」': 3,
-                                                       '四天王奥義「三歩必殺」': 3,
+                                                       '鬼符「怪力乱神」': {'stage_num': 3, 'is_mid_boss': True},
+                                                       '枷符「咎人の外さぬ枷」': {'stage_num': 3, 'is_mid_boss': False},
+                                                       '力業「大江山颪」': {'stage_num': 3, 'is_mid_boss': False},
+                                                       '四天王奥義「三歩必殺」': {'stage_num': 3, 'is_mid_boss': False},
                                                        # stage4
-                                                       '想起「恐怖催眠術」': 4,
-                                                       '想起「二重黒死蝶」': 4,             # 霊夢A
-                                                       '想起「戸隠山投げ」': 4,             # 霊夢B
-                                                       '想起「風神木の葉隠れ」': 4,         # 霊夢C
-                                                       '想起「春の京人形」': 4,             # 魔理沙A
-                                                       '想起「マーキュリポイズン」': 4,     # 魔理沙B
-                                                       '想起「のびーるアーム」': 4,         # 魔理沙C
-                                                       '想起「飛行虫ネスト」': 4,           # 霊夢A
-                                                       '想起「百万鬼夜行」': 4,             # 霊夢B
-                                                       '想起「天狗のマクロバースト」': 4,   # 霊夢C
-                                                       '想起「ストロードールカミカゼ」': 4, # 魔理沙A
-                                                       '想起「プリンセスウンディネ」': 4,   # 魔理沙B
-                                                       '想起「河童のポロロッカ」': 4,       # 魔理沙C
-                                                       '想起「波と粒の境界」': 4,           # 霊夢A
-                                                       '想起「濛々迷霧」': 4,               # 霊夢B
-                                                       '想起「鳥居つむじ風」': 4,           # 霊夢C
-                                                       '想起「リターンイナニメトネス」': 4, # 魔理沙A
-                                                       '想起「賢者の石」': 4,               # 魔理沙B
-                                                       '想起「光り輝く水底のトラウマ」': 4, # 魔理沙C
+                                                       '想起「恐怖催眠術」': {'stage_num': 4, 'is_mid_boss': False},
+                                                       '想起「二重黒死蝶」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢A
+                                                       '想起「戸隠山投げ」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢B
+                                                       '想起「風神木の葉隠れ」': {'stage_num': 4, 'is_mid_boss': False},        # 霊夢C
+                                                       '想起「春の京人形」': {'stage_num': 4, 'is_mid_boss': False},            # 魔理沙A
+                                                       '想起「マーキュリポイズン」': {'stage_num': 4, 'is_mid_boss': False},    # 魔理沙B
+                                                       '想起「のびーるアーム」': {'stage_num': 4, 'is_mid_boss': False},        # 魔理沙C
+                                                       '想起「飛行虫ネスト」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢A
+                                                       '想起「百万鬼夜行」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢B
+                                                       '想起「天狗のマクロバースト」': {'stage_num': 4, 'is_mid_boss': False},  # 霊夢C
+                                                       '想起「ストロードールカミカゼ」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙A
+                                                       '想起「プリンセスウンディネ」': {'stage_num': 4, 'is_mid_boss': False},  # 魔理沙B
+                                                       '想起「河童のポロロッカ」': {'stage_num': 4, 'is_mid_boss': False},      # 魔理沙C
+                                                       '想起「波と粒の境界」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢A
+                                                       '想起「濛々迷霧」': {'stage_num': 4, 'is_mid_boss': False},              # 霊夢B
+                                                       '想起「鳥居つむじ風」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢C
+                                                       '想起「リターンイナニメトネス」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙A
+                                                       '想起「賢者の石」': {'stage_num': 4, 'is_mid_boss': False},              # 魔理沙B
+                                                       '想起「光り輝く水底のトラウマ」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙C
                                                        # stage5
-                                                       '猫符「怨霊猫乱歩」': 5,
-                                                       '呪精「怨霊憑依妖精」': 5,
-                                                       '屍霊「食人怨霊」': 5,
-                                                       '贖罪「昔時の針と痛がる怨霊」': 5,
-                                                       '「小悪霊復活せし」': 5,
+                                                       '猫符「怨霊猫乱歩」': {'stage_num': 5, 'is_mid_boss': True},
+                                                       '呪精「怨霊憑依妖精」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '屍霊「食人怨霊」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '贖罪「昔時の針と痛がる怨霊」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '「小悪霊復活せし」': {'stage_num': 5, 'is_mid_boss': False},
                                                        # stage6
-                                                       '妖怪「火焔の車輪」': 6,
-                                                       '核熱「ニュークリアエクスカーション」': 6,
-                                                       '爆符「ギガフレア」': 6,
-                                                       '焔星「プラネタリーレボリューション」': 6,
-                                                       '「ヘルズトカマク」': 6,
-                                                       '「サブタレイニアンサン」': 6,
+                                                       '妖怪「火焔の車輪」': {'stage_num': 6, 'is_mid_boss': True},
+                                                       '核熱「ニュークリアエクスカーション」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '爆符「ギガフレア」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '焔星「プラネタリーレボリューション」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '「ヘルズトカマク」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '「サブタレイニアンサン」': {'stage_num': 6, 'is_mid_boss': False},
                                                        },
                             DIFFICULTY_LUNATIC_VALUE: {
                                                        # stage1
-                                                       '怪奇「釣瓶落としの怪」': 1, # H/L限定
-                                                       '蜘蛛「石窟の蜘蛛の巣」': 1,
-                                                       '瘴気「原因不明の熱病」': 1,
+                                                       '怪奇「釣瓶落としの怪」': {'stage_num': 1, 'is_mid_boss': True}, # H/L限定
+                                                       '蜘蛛「石窟の蜘蛛の巣」': {'stage_num': 1, 'is_mid_boss': False},
+                                                       '瘴気「原因不明の熱病」': {'stage_num': 1, 'is_mid_boss': False},
                                                        # stage2
-                                                       '嫉妬「緑色の目をした見えない怪物」': 2,
-                                                       '花咲爺「シロの灰」': 2,
-                                                       '舌切雀「大きな葛籠と小さな葛籠」': 2,
-                                                       '恨符「丑の刻参り七日目」': 2,
+                                                       '嫉妬「緑色の目をした見えない怪物」': {'stage_num': 2, 'is_mid_boss': True},
+                                                       '花咲爺「シロの灰」': {'stage_num': 2, 'is_mid_boss': False},
+                                                       '舌切雀「大きな葛籠と小さな葛籠」': {'stage_num': 2, 'is_mid_boss': False},
+                                                       '恨符「丑の刻参り七日目」': {'stage_num': 2, 'is_mid_boss': False},
                                                        # stage3
-                                                       '鬼符「怪力乱神」': 3,
-                                                       '枷符「咎人の外さぬ枷」': 3,
-                                                       '力業「大江山颪」': 3,
-                                                       '四天王奥義「三歩必殺」': 3,
+                                                       '鬼符「怪力乱神」': {'stage_num': 3, 'is_mid_boss': True},
+                                                       '枷符「咎人の外さぬ枷」': {'stage_num': 3, 'is_mid_boss': False},
+                                                       '力業「大江山颪」': {'stage_num': 3, 'is_mid_boss': False},
+                                                       '四天王奥義「三歩必殺」': {'stage_num': 3, 'is_mid_boss': False},
                                                        # stage4
-                                                       '想起「恐怖催眠術」': 4,
-                                                       '想起「二重黒死蝶」': 4,             # 霊夢A
-                                                       '想起「戸隠山投げ」': 4,             # 霊夢B
-                                                       '想起「風神木の葉隠れ」': 4,         # 霊夢C
-                                                       '想起「春の京人形」': 4,             # 魔理沙A
-                                                       '想起「マーキュリポイズン」': 4,     # 魔理沙B
-                                                       '想起「のびーるアーム」': 4,         # 魔理沙C
-                                                       '想起「飛行虫ネスト」': 4,           # 霊夢A
-                                                       '想起「百万鬼夜行」': 4,             # 霊夢B
-                                                       '想起「天狗のマクロバースト」': 4,   # 霊夢C
-                                                       '想起「ストロードールカミカゼ」': 4, # 魔理沙A
-                                                       '想起「プリンセスウンディネ」': 4,   # 魔理沙B
-                                                       '想起「河童のポロロッカ」': 4,       # 魔理沙C
-                                                       '想起「波と粒の境界」': 4,           # 霊夢A
-                                                       '想起「濛々迷霧」': 4,               # 霊夢B
-                                                       '想起「鳥居つむじ風」': 4,           # 霊夢C
-                                                       '想起「リターンイナニメトネス」': 4, # 魔理沙A
-                                                       '想起「賢者の石」': 4,               # 魔理沙B
-                                                       '想起「光り輝く水底のトラウマ」': 4, # 魔理沙C
+                                                       '想起「恐怖催眠術」': {'stage_num': 4, 'is_mid_boss': False},
+                                                       '想起「二重黒死蝶」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢A
+                                                       '想起「戸隠山投げ」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢B
+                                                       '想起「風神木の葉隠れ」': {'stage_num': 4, 'is_mid_boss': False},        # 霊夢C
+                                                       '想起「春の京人形」': {'stage_num': 4, 'is_mid_boss': False},            # 魔理沙A
+                                                       '想起「マーキュリポイズン」': {'stage_num': 4, 'is_mid_boss': False},    # 魔理沙B
+                                                       '想起「のびーるアーム」': {'stage_num': 4, 'is_mid_boss': False},        # 魔理沙C
+                                                       '想起「飛行虫ネスト」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢A
+                                                       '想起「百万鬼夜行」': {'stage_num': 4, 'is_mid_boss': False},            # 霊夢B
+                                                       '想起「天狗のマクロバースト」': {'stage_num': 4, 'is_mid_boss': False},  # 霊夢C
+                                                       '想起「ストロードールカミカゼ」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙A
+                                                       '想起「プリンセスウンディネ」': {'stage_num': 4, 'is_mid_boss': False},  # 魔理沙B
+                                                       '想起「河童のポロロッカ」': {'stage_num': 4, 'is_mid_boss': False},      # 魔理沙C
+                                                       '想起「波と粒の境界」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢A
+                                                       '想起「濛々迷霧」': {'stage_num': 4, 'is_mid_boss': False},              # 霊夢B
+                                                       '想起「鳥居つむじ風」': {'stage_num': 4, 'is_mid_boss': False},          # 霊夢C
+                                                       '想起「リターンイナニメトネス」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙A
+                                                       '想起「賢者の石」': {'stage_num': 4, 'is_mid_boss': False},              # 魔理沙B
+                                                       '想起「光り輝く水底のトラウマ」': {'stage_num': 4, 'is_mid_boss': False},# 魔理沙C
                                                        # stage5
-                                                       '猫符「怨霊猫乱歩」': 5,
-                                                       '呪精「怨霊憑依妖精」': 5,
-                                                       '屍霊「食人怨霊」': 5,
-                                                       '贖罪「昔時の針と痛がる怨霊」': 5,
-                                                       '「小悪霊復活せし」': 5,
+                                                       '猫符「怨霊猫乱歩」': {'stage_num': 5, 'is_mid_boss': True},
+                                                       '呪精「怨霊憑依妖精」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '屍霊「食人怨霊」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '贖罪「昔時の針と痛がる怨霊」': {'stage_num': 5, 'is_mid_boss': False},
+                                                       '「小悪霊復活せし」': {'stage_num': 5, 'is_mid_boss': False},
                                                        # stage6
-                                                       '妖怪「火焔の車輪」': 6,
-                                                       '核熱「核反応制御不能」': 6,
-                                                       '爆符「ペタフレア」': 6,
-                                                       '焔星「十凶星」': 6,
-                                                       '「ヘルズトカマク」': 6,
-                                                       '「サブタレイニアンサン」': 6,
+                                                       '妖怪「火焔の車輪」': {'stage_num': 6, 'is_mid_boss': True},
+                                                       '核熱「核反応制御不能」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '爆符「ペタフレア」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '焔星「十凶星」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '「ヘルズトカマク」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       '「サブタレイニアンサン」': {'stage_num': 6, 'is_mid_boss': False},
+                                                       },
+                            DIFFICULTY_EXTRA_VALUE:   {
+                                                       '秘法「九字刺し」': {'stage_num': 'EX', 'is_mid_boss': True},
+                                                       '奇跡「ミラクルフルーツ」': {'stage_num': 'EX', 'is_mid_boss': True},
+                                                       '神徳「五穀豊穣ライスシャワー」': {'stage_num': 'EX', 'is_mid_boss': True},
+                                                       '表象「夢枕にご先祖総立ち」': {'stage_num': 'EX', 'is_mid_boss': False},
+                                                       '表象「弾幕パラノイア」': {'stage_num': 'EX', 'is_mid_boss': False},
+                                                       '本能「イドの解放」': {'stage_num': 'EX', 'is_mid_boss': False},
+                                                       '抑制「スーパーエゴ」': {'stage_num': 'EX', 'is_mid_boss': False},
+                                                       '反応「妖怪ポリグラフ」': {'stage_num': 'EX', 'is_mid_boss': False},
+                                                       '無意識「弾幕のロールシャッハ」': {'stage_num': 'EX', 'is_mid_boss': False},
+                                                       '復燃「恋の埋火」': {'stage_num': 'EX', 'is_mid_boss': False},
+                                                       '深層「無意識の遺伝子」': {'stage_num': 'EX', 'is_mid_boss': False},
+                                                       '「嫌われ者のフィロソフィ」': {'stage_num': 'EX', 'is_mid_boss': False},
+                                                       '「サブタレイニアンローズ」': {'stage_num': 'EX', 'is_mid_boss': False},
                                                        }
 }
 # スペルカードとボス残機のマッピングデータ
@@ -1592,14 +1609,15 @@ def inconsistency_check(output, difficulty, boss_name, is_boss_attack, boss_rema
     return True
 
 
-def output_csv(results):
+def output_csv(results, development):
     # CSV出力処理
 
     # 重複を含めたすべてのデータをCSV出力
     save_datetime = datetime.now().strftime('%Y%m%d%H%M%S')
-    all_results = append_current_position(results)
-    all_result_csv = save_datetime + '_all_result.csv'
-    save_csv(all_result_csv, all_results)
+    if (development):
+        all_results = append_current_position(results)
+        all_result_csv = save_datetime + '_all_result.csv'
+        save_csv(all_result_csv, all_results)
 
     # 重複を除外した配列データを作成する
     squeezed_results = []
@@ -1682,6 +1700,8 @@ def output_csv(results):
     # 補正処理2の後にボス名が存在し、現在地が空のデータはゴミと見なして削除する
     # また、ボス名と現在値が空のデータは道中と見なす
     current_stage = None
+    is_mid_boss = None
+    current_dotyu_suffix = '後半' # 後ろからループするのでとりあえず"後半"を初期値とする
     for current_index in reversed(range(len(squeezed_results))):
         current = squeezed_results[current_index]
 
@@ -1693,7 +1713,14 @@ def output_csv(results):
         # 難易度とスペルカードから現在のステージ番号を取得
         if (current[CSV_INDEX_DIFFICULTY] is not None and current[CSV_INDEX_SPELL_CARD] is not None):
             try:
-                current_stage = CURRENT_STAGE_DICTIONARY[current[CSV_INDEX_DIFFICULTY]][current[CSV_INDEX_SPELL_CARD]]
+                current_stage = CURRENT_STAGE_DICTIONARY[current[CSV_INDEX_DIFFICULTY]][current[CSV_INDEX_SPELL_CARD]]['stage_num']
+                is_mid_boss = CURRENT_STAGE_DICTIONARY[current[CSV_INDEX_DIFFICULTY]][current[CSV_INDEX_SPELL_CARD]]['is_mid_boss']
+                if (is_mid_boss is True):
+                    # 中ボススペルの前 = 道中前半 と見なす
+                    current_dotyu_suffix = '前半'
+                else:
+                    # 中ボススペル以外 = 道中後半 と見なす
+                    current_dotyu_suffix = '後半'
             except KeyError:
                 pass
 #                 print(current[CSV_INDEX_DIFFICULTY])
@@ -1702,11 +1729,16 @@ def output_csv(results):
         # ボス名と現在値が空のデータは道中と見なす
         # ステージ番号がNoneでないときは"道中"の前にステージ番号を記載する
         if (len(current[CSV_INDEX_BOSS_NAME]) == 0 and len(current[CSV_INDEX_CURRENT_POSITION]) == 0):
-            squeezed_results[current_index][CSV_INDEX_CURRENT_POSITION] = (str(current_stage) + '面道中') if (current_stage is not None and current_stage > 0) else ('道中')
+            dotyu_text = (str(current_stage) + '面道中' + current_dotyu_suffix) if (current_stage is not None) else ('道中' + current_dotyu_suffix)
+            squeezed_results[current_index][CSV_INDEX_CURRENT_POSITION] = dotyu_text
 
     # 重複を除外したデータをCSV出力
     squeezed_result_csv = save_datetime + '_result.csv'
     save_csv(squeezed_result_csv, squeezed_results)
-    print(colored("\n結果を以下のCSVに出力しました。\n全てのキャプチャ結果：{0}\n重複を除いたキャプチャ結果：{1}".format(all_result_csv, squeezed_result_csv), "green", attrs=['bold']))
+
+    if (development):
+        print(colored("\n結果を以下のCSVに出力しました。\n全てのキャプチャ結果：{0}\n重複を除いたキャプチャ結果：{1}".format(all_result_csv, squeezed_result_csv), "green", attrs=['bold']))
+    else:
+        print(colored("\n結果を以下のCSVに出力しました。\nファイル名：{0}".format(squeezed_result_csv), "green", attrs=['bold']))
 
     return
