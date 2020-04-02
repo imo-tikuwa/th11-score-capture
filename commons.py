@@ -328,6 +328,7 @@ TIME_TABLES = {
                                  BOSS_YUGI:   {
                                                2:    BOSS_YUGI_NAME + '通常1',
                                                1:    BOSS_YUGI_NAME + '通常2',
+                                               None: BOSS_YUGI_NAME + '通常3',
                                                },
                                  BOSS_SATORI: {
                                                2:    BOSS_SATORI_NAME + '通常1',
@@ -360,6 +361,7 @@ TIME_TABLES = {
                                  BOSS_YUGI:   {
                                                2:    BOSS_YUGI_NAME + '通常1',
                                                1:    BOSS_YUGI_NAME + '通常2',
+                                               None: BOSS_YUGI_NAME + '通常3',
                                                },
                                  BOSS_SATORI: {
                                                2:    BOSS_SATORI_NAME + '通常1',
@@ -392,6 +394,7 @@ TIME_TABLES = {
                                  BOSS_YUGI:   {
                                                2:    BOSS_YUGI_NAME + '通常1',
                                                1:    BOSS_YUGI_NAME + '通常2',
+                                               None: BOSS_YUGI_NAME + '通常3',
                                                },
                                  BOSS_SATORI: {
                                                2:    BOSS_SATORI_NAME + '通常1',
@@ -424,6 +427,7 @@ TIME_TABLES = {
                                  BOSS_YUGI:   {
                                                2:    BOSS_YUGI_NAME + '通常1',
                                                1:    BOSS_YUGI_NAME + '通常2',
+                                               None: BOSS_YUGI_NAME + '通常3',
                                                },
                                  BOSS_SATORI: {
                                                2:    BOSS_SATORI_NAME + '通常1',
@@ -999,8 +1003,9 @@ for index in range(5):
 # 難易度のROI
 DIFFICULTY_ROI = (972, 37, 1136, 90)
 
-# ボス名のROI
-BOSS_NAME_ROI = (76, 56, 246, 72)
+# ボス名のROI(三歩必殺でUIがブレる件に対応、閾値も変更する)
+# BOSS_NAME_ROI = (76, 56, 246, 72)
+BOSS_NAME_ROI = (64, 32, 289, 122)
 
 # ボス残機のROI配列
 BOSS_REMAIN_ROIS =[]
@@ -1273,6 +1278,7 @@ def analyze_difficulty(work_frame):
 def analyze_boss_name(original_frame):
     # ボス名をテンプレートマッチングにより取得
     # 自機が画面左上のボス名に重なると、ボス名が透明になってしまう模様
+    # 3面の四天王奥義「三歩必殺」でUIがブレると取れなくなってしまうため探索するROIの範囲を広げた
     boss_name = None
 
     # ボス名は単色（R:119、G:255、B:255）なので色を指定して二値化することで完全一致に近いマッチングが可能
@@ -1286,7 +1292,7 @@ def analyze_boss_name(original_frame):
         res = cv2.matchTemplate(boss_name_frame, template_img, cv2.TM_CCORR_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 #         print(min_val, max_val, min_loc, max_loc)
-        if (max_val > 0.99):
+        if (max_val > 0.98):
             boss_name = num
             break
 
