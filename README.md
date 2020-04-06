@@ -16,9 +16,10 @@ CSVファイルで出力するプログラムです。
 ```
 git clone https://github.com/imo-tikuwa/th11-score-capture
 cd th11-score-capture
+python -m venv venv
 .\venv\Scripts\activate.bat
 pip install -r requirements.txt
-python app.rb
+python app.py
 ```
 
 ---
@@ -26,7 +27,7 @@ python app.rb
 ```
 cd th11-score-capture
 .\venv\Scripts\activate.bat
-python app.rb
+python app.py
 ```
 
 ---
@@ -73,7 +74,7 @@ pyinstaller app.spec
 ## 使い方
 1. プログラムを実行する
 ```
-python app.rb --output --capture-period 0.3
+python app.py --output --capture-period 0.3
 ```
 
 2.  (初回のみ)th11.exeの場所を指定する
